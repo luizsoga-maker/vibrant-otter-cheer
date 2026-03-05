@@ -6,7 +6,7 @@ import { Signup } from './pages/Signup';
 import { Dashboard } from './pages/Dashboard';
 import { AIGenerator } from './pages/AIGenerator';
 import { SiteEditor } from './pages/SiteEditor';
-import { NotFound } from './pages/NotFound';
+import NotFound from './pages/NotFound';
 
 const App = () => {
   return (
