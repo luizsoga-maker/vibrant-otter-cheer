@@ -26,6 +26,12 @@ export const CachingPanel: React.FC = () => {
     }
   };
 
+  const removeTag = (idx: number) => {
+    const tags = [...(cachingData.cacheTags || [])];
+    tags.splice(idx, 1);
+    handleUpdate('cacheTags', tags);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -80,18 +86,14 @@ export const CachingPanel: React.FC = () => {
             <div className="space-y-2">
               <Label>Cache Tags (for purging)</Label>
               <div className="flex flex-wrap gap-2 mb-2">
-                {cachingData.cacheTags?.map((tag: string, idx: number) => (
+                {(cachingData.cacheTags || []).map((tag: string, idx: number) => (
                   <div
                     key={idx}
                     className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded"
                   >
                     <span className="text-sm">{tag}</span>
                     <button
-                      onClick={() => {
-                        const tags = [...cachingData.cacheTags];
-                        tags.splice(idx, 1);
-                        handleUpdate('cacheTags', tags);
-                      }}
+                      onClick={() => removeTag(idx)}
                       className="text-red-500 hover:text-red-700 text-sm"
                     >
                       ×

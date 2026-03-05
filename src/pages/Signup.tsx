@@ -8,25 +8,48 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { API_BASE_URL } from '@/config';
 
 export const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
+
+  const testApiConnection = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/health`);
+      if (response.ok) {
+        showSuccess('API connection successful!');
+      } else {
+        showError(`API error: ${response.status} ${response.statusText}`);
+      }
+    } catch (error: any) {
+      showError(`Cannot connect to API at ${API_BASE_URL}. Make sure the backend is running.`);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      if (password !== confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+
+      if (password.length < 6) {
+        throw new Error('Password must be at least 6 characters');
+      }
+
       await signup(email, password, name);
       showSuccess('Account created successfully!');
       navigate('/dashboard');
-    } catch (error) {
-      showError('Failed to create account');
+    } catch (error: any) {
+      showError(error.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
@@ -77,12 +100,32 @@ export const Signup = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
+              />
+              <p className="text-xs text-slate-500">At least 6 characters</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
               />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Creating account...' : 'Create account'}
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full"
+              onClick={testApiConnection}
+            >
+              Test API Connection
             </Button>
             <div className="text-center text-sm text-muted-foreground">
               By signing up, you agree to our <a href="/terms" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>.
