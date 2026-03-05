@@ -1,25 +1,34 @@
 import {
-  Injectable,
-  ExecutionContext,
-  CallHandler,
-  NestInterceptor,
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { HttpExceptionFilter } from './http-exception.filter';
+import { Request, Response } from 'express';
 
-@Injectable()
-export class HttpExceptionFilter implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    return next.handle().catch((error) => {
-      if (error instanceof HttpException) {
-        return error;
-      }
-      return new HttpException(
-        { status: HttpStatus.INTERNAL_SERVER_ERROR, error: 'Internal server error' },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+@Catch()
+export class HttpExceptionFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    const message =
+      exception instanceof HttpException
+        ? exception.getResponse()
+        : 'Internal server error';
+
+    response.status(status).json({
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      message,
     });
   }
 }
