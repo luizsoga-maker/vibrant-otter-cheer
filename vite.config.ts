@@ -3,10 +3,9 @@ import dyadComponentTagger from "@dyad-sh/react-vite-component-tagger";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
-// IMPORTANTE: Para GitHub Pages, defina a base conforme seu repositório
-// Se for: username.github.io/sitecraft-ai/ → base: '/sitecraft-ai/'
-// Se for: username.github.io/ (user site) → base: '/'
-const base = '/sitecraft-ai/';
+// IMPORTANTE: Para GitHub Pages, a base deve ser o nome do seu repositório
+// Seu repositório: vibrant-otter-cheer
+const base = '/vibrant-otter-cheer/';
 
 export default defineConfig({
   base: base,
