@@ -5,7 +5,8 @@ import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { Dashboard } from './pages/Dashboard';
 import { AIGenerator } from './pages/AIGenerator';
-import { SiteEditor } from './pages/SiteEditor';
+import { SiteEditorEnhanced } from './components/SiteEditorEnhanced';
+import { SitePreview } from './pages/SitePreview';
 import NotFound from './pages/NotFound';
 
 const App = () => {
@@ -18,7 +19,8 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/ai-generator" element={<AIGenerator />} />
-          <Route path="/sites/:id" element={<SiteEditor />} />
+          <Route path="/sites/:id/edit" element={<SiteEditorEnhanced />} />
+          <Route path="/sites/:id" element={<SitePreview />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>

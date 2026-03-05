@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, ExternalLink, BarChart3, Globe, Sparkles } from 'lucide-react';
+import { Plus, ExternalLink, Edit } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { MainLayout } from '@/components/layout/MainLayout';
 
@@ -51,6 +51,10 @@ export const Dashboard = () => {
   };
 
   const handleEditSite = (id: string) => {
+    navigate(`/sites/${id}/edit`);
+  };
+
+  const handlePreviewSite = (id: string) => {
     navigate(`/sites/${id}`);
   };
 
@@ -85,7 +89,7 @@ export const Dashboard = () => {
             <CardContent className="pt-6">
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="h-8 w-8 text-blue-600" />
+                  <Plus className="h-8 w-8 text-blue-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">No websites yet</h3>
                 <p className="text-slate-600 mb-6">
@@ -118,11 +122,9 @@ export const Dashboard = () => {
                 <CardContent>
                   <div className="space-y-2 text-sm text-slate-600">
                     <div className="flex items-center">
-                      <Globe className="h-4 w-4 mr-2" />
                       <span>Site ID: {site.id}</span>
                     </div>
                     <div className="flex items-center">
-                      <BarChart3 className="h-4 w-4 mr-2" />
                       <span>Created: {new Date(site.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
@@ -134,12 +136,13 @@ export const Dashboard = () => {
                     className="flex-1"
                     onClick={() => handleEditSite(site.id)}
                   >
+                    <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </Button>
                   <Button 
                     size="sm" 
                     className="flex-1"
-                    onClick={() => window.open(`http://localhost:3000/sites/${site.id}`, '_blank')}
+                    onClick={() => handlePreviewSite(site.id)}
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Preview
