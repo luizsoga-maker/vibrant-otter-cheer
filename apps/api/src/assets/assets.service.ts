@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import AWS from 'aws-sdk';
+import * as AWS from 'aws-sdk';
 import * as path from 'path';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class AssetsService {
     });
   }
 
-  async uploadFile(file: Express.Multer.File) {
+  async uploadFile(file: any) {
     const fileKey = `assets/${Date.now()}-${file.originalname}`;
     const fileUrl = `${process.env.MINIO_URL}/${fileKey}`;
 

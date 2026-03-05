@@ -10,7 +10,7 @@ export class AssetsController {
   @Post('upload')
   @UseGuards(JwtAuthGuard)
   @FileInterceptor('file')
-  async upload(@UploadedFile() file: Express.Multer.File) {
+  async upload(@UploadedFile() file: any) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }

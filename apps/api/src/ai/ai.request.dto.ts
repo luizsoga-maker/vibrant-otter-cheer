@@ -1,6 +1,4 @@
-export interface AiProvider {
-  generate(request: AiRequestDto): Promise<AiResponseDto>;
-}
+import { AiProvider } from './ai.provider';
 
 export interface AiRequestDto {
   profession: string;
