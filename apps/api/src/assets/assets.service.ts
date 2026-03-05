@@ -21,7 +21,6 @@ export class AssetsService {
     const fileKey = `assets/${Date.now()}-${file.originalname}`;
     const fileUrl = `${process.env.MINIO_URL}/${fileKey}`;
 
-    // Upload to S3/MinIO
     await this.s3.putObject({
       Bucket: process.env.S3_BUCKET,
       Key: fileKey,
@@ -29,7 +28,6 @@ export class AssetsService {
       ContentType: file.mimetype,
     }).promise();
 
-    // Save to database
     const asset = await this.prisma.asset.create({
       data: {
         key: fileKey,

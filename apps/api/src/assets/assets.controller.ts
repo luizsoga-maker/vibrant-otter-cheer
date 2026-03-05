@@ -15,7 +15,6 @@ export class AssetsController {
       throw new BadRequestException('No file uploaded');
     }
 
-    // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.mimetype)) {
       throw new BadRequestException('Invalid file type');

@@ -2,13 +2,12 @@ import { Module } from '@nestjs/common';
 import { PagesController } from './pages.controller';
 import { PagesService } from './pages.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Page } from '../prisma/page.entity';
-import { Section } from '../prisma/section.entity';
-import { Asset } from '../prisma/asset.entity';
+import { Page } from './page.entity';
+import { Section } from './section.entity';
 
 @Module({
   controllers: [PagesController],
   providers: [PagesService],
-  imports: [TypeOrmModule.forFeature([Page, Section, Asset])],
+  imports: [TypeOrmModule.forFeature([Page, Section])],
 })
 export class PagesModule {}

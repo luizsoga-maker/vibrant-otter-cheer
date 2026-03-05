@@ -19,7 +19,6 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   async logout(@Request() req: any) {
-    // In a real app, you might want to blacklist the token
     return { message: 'Logged out successfully' };
   }
 

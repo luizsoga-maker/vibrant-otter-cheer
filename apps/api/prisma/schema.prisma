@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  passwordHash String
+  sites     Site[]
+  billing   Billing?
+}
+
+model Site {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String
+  theme     Json
+  status    Status   @default("DRAFT")
+  pages     Page[]
+  assets    Asset[]
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Page {
+  id        Int      @id @default(autoincrement())
+  siteId    Int
+  slug      String
+  title     String
+  sections  Json
+  site      Site     @relation(fields: [siteId], references: [id])
+}
+
+model Asset {
+  id        Int      @id @default(autoincrement())
+  key       String
+  url       String
+  filename  String
+  size      Int
+  type      String
+  siteId    Int
+  site      Site     @relation(fields: [siteId], references: [id])
+}
+
+model Billing {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  plan          String
+  stripeCustomerId String
+  status        Status   @default("ACTIVE")
+  subscription  Subscription?
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id            Int      @id @default(autoincrement())
+  customerId    String
+  status        Status   @default("ACTIVE")
+  currentPeriodEnd DateTime
+  trialEnd      DateTime?
+}
+
+enum Status {
+  DRAFT
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}

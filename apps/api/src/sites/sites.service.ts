@@ -9,30 +9,42 @@ export class SitesService {
 
   async createSite(createSiteDto: CreateSiteDto) {
     return this.prisma.site.create({
-      data: createSiteDto,
+      data: {
+        ...createSiteDto,
+        status: 'DRAFT',
+      },
     });
   }
 
   async getAllSites() {
-    return this.prisma.site.findMany();
+    return this.prisma.site.findMany({
+      include: {
+        pages: true,
+        assets: true,
+      },
+    });
   }
 
   async getSiteById(id: string) {
     return this.prisma.site.findUnique({
-      where: { id },
+      where: { id: Number(id) },
+      include: {
+        pages: true,
+        assets: true,
+      },
     });
   }
 
   async updateSite(id: string, updateSiteDto: UpdateSiteDto) {
     return this.prisma.site.update({
-      where: { id },
+      where: { id: Number(id) },
       data: updateSiteDto,
     });
   }
 
   async deleteSite(id: string) {
     return this.prisma.site.delete({
-      where: { id },
+      where: { id: Number(id) },
     });
   }
 }

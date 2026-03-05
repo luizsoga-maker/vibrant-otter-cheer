@@ -3,6 +3,11 @@ import { SitesController } from './sites.controller';
 import { SitesService } from './sites.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Site } from '../prisma/site.entity';
-import { Page } from '../prisma/page.entity';
-import { Section } from '../prisma/section.entity';
-import { Asset } from '../prisma/asset.entity';
+import { Page } from '../pages/page.entity';
+
+@Module({
+  controllers: [SitesController],
+  providers: [SitesService],
+  imports: [TypeOrmModule.forFeature([Site, Page])],
+})
+export class SitesModule {}

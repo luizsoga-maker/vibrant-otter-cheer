@@ -4,7 +4,6 @@ import { AiProvider, AiRequestDto, AiResponseDto } from '../ai.provider';
 @Injectable()
 export class MockProvider implements AiProvider {
   async generate(request: AiRequestDto): Promise<AiResponseDto> {
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     return {

@@ -72,7 +72,7 @@ export class AiService {
           siteId: site.id,
           slug: page.slug,
           title: page.title,
-          sections: page.sections, // Store as JSON
+          sections: page.sections,
         },
       });
     }

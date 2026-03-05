@@ -41,7 +41,6 @@ export class BillingService {
       throw new Error('User not found');
     }
 
-    // Create Stripe customer if not exists
     let customer = await this.prisma.billing.findUnique({
       where: { userId },
     });
@@ -62,7 +61,6 @@ export class BillingService {
       });
     }
 
-    // Create subscription
     const subscription = await this.stripe.subscriptions.create({
       customer: customer.stripeCustomerId,
       items: [{ price: this.getPriceIdForPlan(planId) }],

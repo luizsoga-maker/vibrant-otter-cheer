@@ -149,12 +149,10 @@ Return ONLY valid JSON in this exact format:
 
   private parseResponse(text: string): AiResponseDto {
     try {
-      // Extract JSON from response (in case there's extra text)
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error('No JSON found in response');
       }
-
       const json = JSON.parse(jsonMatch[0]);
       return json as AiResponseDto;
     } catch (error) {
