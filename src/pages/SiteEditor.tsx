@@ -6,11 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { showSuccess, showError } from '@/utils/toast';
-import { Save, Eye, ArrowLeft, Plus, Trash2, GripVertical } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Trash2 } from 'lucide-react';
 
 interface Section {
   id: string;
@@ -116,7 +115,6 @@ export const SiteEditor = () => {
           subtitle: 'Your subtitle here',
           ctaText: 'Call to Action',
           ctaLink: '/contact',
-          backgroundImage: '',
         };
       case 'about':
         return {
@@ -221,7 +219,7 @@ export const SiteEditor = () => {
 
           {type === 'services' && (
             <div className="space-y-2">
-              <Label>Services (one per line)</Label>
+              <Label>Services (one per line, format: Title:Description)</Label>
               <Textarea
                 value={props.services?.map((s: any) => `${s.title}:${s.description}`).join('\n') || ''}
                 onChange={(e) => {
@@ -363,7 +361,6 @@ export const SiteEditor = () => {
                 <div className="flex items-center justify-between">
                   <CardTitle>Page Editor</CardTitle>
                   <Button variant="outline" size="sm">
-                    <Eye className="h-4 w-4 mr-2" />
                     Preview
                   </Button>
                 </div>
@@ -398,10 +395,7 @@ export const SiteEditor = () => {
                     <Label className="text-base font-semibold mb-4 block">Sections</Label>
                     <div className="space-y-4">
                       {currentPage?.sections?.map((section: Section, index: number) => (
-                        <div key={section.id} className="relative">
-                          <div className="absolute -left-8 top-4 cursor-move text-slate-400">
-                            <GripVertical className="h-5 w-5" />
-                          </div>
+                        <div key={section.id}>
                           {renderSectionEditor(activePage, section, index)}
                         </div>
                       )) || (

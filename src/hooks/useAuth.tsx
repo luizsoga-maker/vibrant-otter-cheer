@@ -1,6 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PrismaClient } from '@prisma/client';
 import { toast } from 'sonner';
+
+const prisma = new PrismaClient();
 
 interface User {
   id: string;

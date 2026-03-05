@@ -116,7 +116,7 @@ const Index = () => {
               <h2 className="text-3xl font-bold text-white mb-4">
                 Ready to Build Your Dream Website?
               </h2>
-              <p className="text-blue-100 mb-8 max-w-xl mx-auto">
+              <p className="text-blue-100 mb-6 max-w-xl mx-auto">
                 Join thousands of businesses using SiteCraft AI to create beautiful, 
                 effective websites in minutes.
               </p>
