@@ -3,11 +3,13 @@ import { AiController } from './ai.controller';
 import { AiService } from './ai.service';
 import { OpenAIProvider } from './providers/openai.provider';
 import { MockProvider } from './providers/mock.provider';
+import { PrismaService } from '../prisma.service';
 
 @Module({
   controllers: [AiController],
   providers: [
     AiService,
+    PrismaService,
     {
       provide: 'AI_PROVIDER',
       useClass: process.env.NODE_ENV === 'production' ? OpenAIProvider : MockProvider,

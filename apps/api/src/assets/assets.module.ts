@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AssetsController } from './assets.controller';
 import { AssetsService } from './assets.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Asset } from '../prisma/asset.entity';
+import { PrismaService } from '../prisma.service';
 
 @Module({
   controllers: [AssetsController],
-  providers: [AssetsService],
-  imports: [TypeOrmModule.forFeature([Asset])],
+  providers: [AssetsService, PrismaService],
 })
 export class AssetsModule {}

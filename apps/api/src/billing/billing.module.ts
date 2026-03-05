@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common';
 import { BillingController } from './billing.controller';
 import { BillingService } from './billing.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Billing } from '../prisma/billing.entity';
-import { User } from '../prisma/user.entity';
+import { PrismaService } from '../prisma.service';
 
 @Module({
   controllers: [BillingController],
-  providers: [BillingService],
-  imports: [TypeOrmModule.forFeature([Billing, User])],
+  providers: [BillingService, PrismaService],
 })
 export class BillingModule {}

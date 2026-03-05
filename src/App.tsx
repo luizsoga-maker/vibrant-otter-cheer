@@ -5,7 +5,7 @@ import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { Dashboard } from './pages/Dashboard';
 import { AIGenerator } from './pages/AIGenerator';
-import { SiteEditorEnhanced } from './components/SiteEditorEnhanced';
+import { SiteEditorEnhanced } from './components/site-editor/SiteEditorEnhanced';
 import { SitePreview } from './pages/SitePreview';
 import { Assets } from './pages/Assets';
 import NotFound from './pages/NotFound';

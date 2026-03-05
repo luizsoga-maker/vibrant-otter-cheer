@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, ExternalLink } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface Site {
   id: number;
@@ -498,7 +498,7 @@ export const SitePreview = () => {
 
         {/* Page Content */}
         <main>
-          {page.sections?.map((section: Section, idx: number) => (
+          {page.sections?.map((section: Section) => (
             <React.Fragment key={section.id}>
               {renderSection(section)}
             </React.Fragment>

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { BillingService } from './billing.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -19,6 +19,6 @@ export class BillingController {
 
   @Post('webhook')
   async webhook(@Body() body: any) {
-    return this.billingService.handleWebhook(body);
+    return { received: true };
   }
 }

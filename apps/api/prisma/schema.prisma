@@ -1,3 +1,12 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -11,31 +20,12 @@ model Site {
   id        Int      @id @default(autoincrement())
   name      String
   slug      String
-  theme     Theme
-  status    Status   @default("DRAFT")
+  theme     Json
+  status    Status   @default(DRAFT)
   pages     Page[]
   assets    Asset[]
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-}
-
-model Theme {
-  id        Int      @id @default(autoincrement())
-  colors    ThemeColors
-  typography ThemeTypography
-}
-
-model ThemeColors {
-  primary   String
-  secondary String
-  background String
-  text      String
-}
-
-model ThemeTypography {
-  fontFamily String
-  fontSize   String
-  lineHeight String
+  userId    Int?
+  user      User?     @relation(fields: [userId], references: [id])
 }
 
 model Page {
@@ -44,37 +34,27 @@ model Page {
   slug      String
   title     String
   sections  Json
-  site      Site     @relation(fields: [siteId], references: [id])
+  site      Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
 }
 
 model Asset {
   id        Int      @id @default(autoincrement())
-  key       String   @unique
+  key       String
   url       String
   filename  String
   size      Int
   type      String
   siteId    Int?
-  site      Site?    @relation(fields: [siteId], references: [id])
-  createdAt DateTime @default(now())
+  site      Site?     @relation(fields: [siteId], references: [id], onDelete: Cascade)
 }
 
 model Billing {
   id            Int      @id @default(autoincrement())
-  userId        Int
+  userId        Int      @unique
   plan          String
   stripeCustomerId String
-  status        Status   @default("ACTIVE")
-  subscription  Subscription?
-  user          User     @relation(fields: [userId], references: [id])
-}
-
-model Subscription {
-  id            Int      @id @default(autoincrement())
-  customerId    String
-  status        Status   @default("ACTIVE")
-  currentPeriodEnd DateTime
-  trialEnd      DateTime?
+  status        Status   @default(ACTIVE)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Status {

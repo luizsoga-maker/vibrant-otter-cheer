@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,9 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { showSuccess, showError } from '@/utils/toast';
 import { API_ENDPOINTS } from '@/config';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 
 export const AIGenerator = () => {
   const [loading, setLoading] = useState(false);
+  const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [formData, setFormData] = useState({
     profession: '',
     name: '',
@@ -25,6 +27,29 @@ export const AIGenerator = () => {
     tone: 'professional',
   });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    checkApiHealth();
+  }, []);
+
+  const checkApiHealth = async () => {
+    try {
+      const response = await fetch(`${API_ENDPOINTS.HEALTH}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        setApiStatus('online');
+      } else {
+        setApiStatus('offline');
+      }
+    } catch (error) {
+      setApiStatus('offline');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +80,7 @@ export const AIGenerator = () => {
         throw new Error(error.message || 'Failed to generate site');
       }
       
-      const data = await response.json();
+      await response.json();
       showSuccess('Website generated successfully!');
       navigate('/dashboard');
     } catch (error: any) {
@@ -82,6 +107,39 @@ export const AIGenerator = () => {
           </p>
         </div>
 
+        {/* API Status Indicator */}
+        <div className={`mb-6 p-4 rounded-lg border ${
+          apiStatus === 'online' ? 'bg-green-50 border-green-200' : 
+          apiStatus === 'offline' ? 'bg-red-50 border-red-200' : 
+          'bg-yellow-50 border-yellow-200'
+        }`}>
+          <div className="flex items-center gap-2">
+            {apiStatus === 'online' && <CheckCircle className="h-5 w-5 text-green-600" />}
+            {apiStatus === 'offline' && <AlertCircle className="h-5 w-5 text-red-600" />}
+            {apiStatus === 'checking' && <div className="h-5 w-5 animate-spin rounded-full border-2 border-yellow-600 border-t-transparent"></div>}
+            <span className={`font-medium ${
+              apiStatus === 'online' ? 'text-green-800' : 
+              apiStatus === 'offline' ? 'text-red-800' : 
+              'text-yellow-800'
+            }`}>
+              {apiStatus === 'online' ? 'API Server is online' : 
+               apiStatus === 'offline' ? 'API Server is offline. Please start the backend server.' : 
+               'Checking API status...'}
+            </span>
+          </div>
+          {apiStatus === 'offline' && (
+            <div className="mt-2 text-sm text-red-700">
+              <p>To start the backend server:</p>
+              <ol className="list-decimal list-inside mt-1 space-y-1">
+                <li>Open a terminal in the <code className="bg-red-100 px-1 rounded">apps/api</code> directory</li>
+                <li>Run: <code className="bg-red-100 px-1 rounded">npm install</code></li>
+                <li>Copy <code className="bg-red-100 px-1 rounded">.env.example</code> to <code className="bg-red-100 px-1 rounded">.env</code></li>
+                <li>Run: <code className="bg-red-100 px-1 rounded">npm run start:dev</code></li>
+              </ol>
+            </div>
+          )}
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle>Your Information</CardTitle>
@@ -98,6 +156,7 @@ export const AIGenerator = () => {
                     onChange={handleChange}
                     placeholder="e.g., Doctor, Lawyer, Consultant"
                     required
+                    disabled={apiStatus === 'offline' || loading}
                   />
                 </div>
 
@@ -110,6 +169,7 @@ export const AIGenerator = () => {
                     onChange={handleChange}
                     placeholder="Your full name"
                     required
+                    disabled={apiStatus === 'offline' || loading}
                   />
                 </div>
 
@@ -122,6 +182,7 @@ export const AIGenerator = () => {
                     onChange={handleChange}
                     placeholder="Your city"
                     required
+                    disabled={apiStatus === 'offline' || loading}
                   />
                 </div>
 
@@ -134,6 +195,7 @@ export const AIGenerator = () => {
                     onChange={handleChange}
                     placeholder="e.g., Cardiology, Family Law"
                     required
+                    disabled={apiStatus === 'offline' || loading}
                   />
                 </div>
 
@@ -146,6 +208,7 @@ export const AIGenerator = () => {
                     onChange={handleChange}
                     placeholder="+1 (555) 000-0000"
                     required
+                    disabled={apiStatus === 'offline' || loading}
                   />
                 </div>
 
@@ -158,6 +221,7 @@ export const AIGenerator = () => {
                     onChange={handleChange}
                     className="w-full p-2 border border-slate-200 rounded-md"
                     required
+                    disabled={apiStatus === 'offline' || loading}
                   >
                     <option value="professional">Professional</option>
                     <option value="friendly">Friendly</option>
@@ -175,6 +239,7 @@ export const AIGenerator = () => {
                   value={formData.address}
                   onChange={handleChange}
                   placeholder="Your business address"
+                  disabled={apiStatus === 'offline' || loading}
                 />
               </div>
 
@@ -186,6 +251,7 @@ export const AIGenerator = () => {
                   value={formData.hours}
                   onChange={handleChange}
                   placeholder="Mon-Fri: 9am - 5pm"
+                  disabled={apiStatus === 'offline' || loading}
                 />
               </div>
 
@@ -198,6 +264,7 @@ export const AIGenerator = () => {
                   onChange={handleChange}
                   placeholder="https://facebook.com/yourpage&#10;https://instagram.com/yourpage&#10;https://linkedin.com/in/yourprofile"
                   rows={3}
+                  disabled={apiStatus === 'offline' || loading}
                 />
               </div>
 
@@ -206,7 +273,7 @@ export const AIGenerator = () => {
                   type="submit" 
                   className="w-full" 
                   size="lg"
-                  disabled={loading}
+                  disabled={loading || apiStatus === 'offline'}
                 >
                   {loading ? 'Generating...' : 'Generate Website with AI'}
                 </Button>

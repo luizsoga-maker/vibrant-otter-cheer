@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
 import { UserNav } from '@/components/UserNav';
 

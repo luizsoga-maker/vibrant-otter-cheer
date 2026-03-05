@@ -37,8 +37,8 @@ export class OpenAIProvider implements AiProvider {
 
       const responseText = completion.choices[0].message.content || '';
       return this.parseResponse(responseText);
-    } catch (error) {
-      throw new Error(`OpenAI API error: ${error.message}`);
+    } catch (error: any) {
+      throw new Error(`OpenAI API error: ${error?.message || error}`);
     }
   }
 
@@ -155,8 +155,8 @@ Return ONLY valid JSON in this exact format:
       }
       const json = JSON.parse(jsonMatch[0]);
       return json as AiResponseDto;
-    } catch (error) {
-      throw new Error(`Failed to parse AI response: ${error.message}`);
+    } catch (error: any) {
+      throw new Error(`Failed to parse AI response: ${error?.message || error}`);
     }
   }
 }

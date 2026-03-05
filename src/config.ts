@@ -8,4 +8,5 @@ export const API_ENDPOINTS = {
   PAGES: `${API_BASE_URL}/api/pages`,
   ASSETS: `${API_BASE_URL}/api/assets`,
   BILLING: `${API_BASE_URL}/api/billing`,
+  HEALTH: `${API_BASE_URL}/api/health`,
 };

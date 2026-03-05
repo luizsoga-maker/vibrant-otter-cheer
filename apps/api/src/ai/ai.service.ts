@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { AiRequestDto, AiResponseDto } from './ai.request.dto';
 import { AiProvider } from './ai.provider';
@@ -10,7 +10,7 @@ export class AiService {
 
   constructor(
     private readonly prisma: PrismaService,
-    @Inject('AI_PROVIDER') private readonly provider: AiProvider,
+    private readonly provider: AiProvider,
   ) {}
 
   async generate(request: AiRequestDto): Promise<AiResponseDto> {

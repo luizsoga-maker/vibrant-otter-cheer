@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 
 interface DeploymentPanelProps {
   deploymentStatus: 'idle' | 'deploying' | 'completed' | 'failed';
@@ -23,102 +22,34 @@ export const DeploymentPanel: React.FC<DeploymentPanelProps> = ({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>Site Deployment</Label>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-3 border rounded-lg">
-              <div className="text-2xl font-bold text-blue-600 mb-1">
-                {deploymentStatus === 'idle' ? '✓' : deploymentStatus === 'deploying' ? '🔄' : deploymentStatus === 'completed' ? '✓' : '✗'}
-              </div>
-              <div className="text-sm text-slate-500">
-                {deploymentStatus === 'idle' ? 'Ready' : deploymentStatus === 'deploying' ? 'Deploying' : deploymentStatus === 'completed' ? 'Completed' : 'Failed'}
-              </div>
-            </div>
-            <div className="p-3 border rounded-lg">
-              <div className="text-2xl font-bold text-green-600 mb-1">
-                {deploymentTarget === 'production' ? 'PROD' : deploymentTarget === 'staging' ? 'STAGE' : 'DEV'}
-              </div>
-              <div className="text-sm text-slate-500">Target</div>
-            </div>
-          </div>
+          <Label>Deployment Target</Label>
+          <select
+            value={deploymentTarget}
+            onChange={(e) => onDeploymentTargetChange(e.target.value as any)}
+            className="w-full p-2 border border-slate-200 rounded-md"
+          >
+            <option value="production">Production</option>
+            <option value="staging">Staging</option>
+            <option value="development">Development</option>
+          </select>
         </div>
-
         {deploymentStatus === 'deploying' && (
-          <div className="w-full bg-slate-200 rounded-full h-2">
-            <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${deploymentProgress}%` }}></div>
+          <div className="space-y-2">
+            <Label>Progress: {deploymentProgress}%</Label>
+            <div className="w-full bg-slate-200 rounded-full h-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full" 
+                style={{ width: `${deploymentProgress}%` }}
+              ></div>
+            </div>
           </div>
         )}
-
-        <div className="space-y-2">
-          <Label>Deployment Target</Label>
-          <div className="space-y-2">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="deploymentTarget"
-                value="production"
-                checked={deploymentTarget === 'production'}
-                onChange={(e) => onDeploymentTargetChange('production')}
-                className="mr-2"
-              />
-              <span className="text-sm">Production</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="deploymentTarget"
-                value="staging"
-                checked={deploymentTarget === 'staging'}
-                onChange={(e) => onDeploymentTargetChange('staging')}
-                className="mr-2"
-              />
-              <span className="text-sm">Staging</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="deploymentTarget"
-                value="development"
-                checked={deploymentTarget === 'development'}
-                onChange={(e) => onDeploymentTargetChange('development')}
-                className="mr-2"
-              />
-              <span className="text-sm">Development</span>
-            </label>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Deployment Options</Label>
-          <div className="space-y-2">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={true}
-                disabled
-                className="mr-2"
-              />
-              <span className="text-sm">Build site</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={true}
-                disabled
-                className="mr-2"
-              />
-              <span className="text-sm">Deploy assets</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={true}
-                disabled
-                className="mr-2"
-              />
-              <span className="text-sm">Update DNS</span>
-            </label>
-          </div>
-        </div>
+        {deploymentStatus === 'completed' && (
+          <div className="text-green-600 text-sm">Deployment completed successfully!</div>
+        )}
+        {deploymentStatus === 'failed' && (
+          <div className="text-red-600 text-sm">Deployment failed. Please try again.</div>
+        )}
       </CardContent>
     </Card>
   );

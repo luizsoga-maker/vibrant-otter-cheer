@@ -15,11 +15,11 @@ export class HealthController {
         database: 'connected',
         timestamp: new Date().toISOString(),
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         status: 'unhealthy',
         database: 'disconnected',
-        error: error.message,
+        error: error?.message || String(error),
         timestamp: new Date().toISOString(),
       };
     }
