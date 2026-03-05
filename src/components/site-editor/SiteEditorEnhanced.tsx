@@ -1,6 +1,5 @@
 "use client";
 
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { 
@@ -20,11 +19,10 @@ import {
   CachingPanel,
   CollaborationPanel,
   SEOPanel
-} from './site-editor';
-import { useSiteEditor } from './site-editor/useSiteEditor';
+} from './';
+import { useSiteEditor } from './useSiteEditor';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { Section } from './site-editor/types';
 
 export const SiteEditorEnhanced = () => {
   const navigate = useNavigate();
@@ -43,9 +41,6 @@ export const SiteEditorEnhanced = () => {
     deploySite,
     updatePageTitle,
     updatePageSlug,
-    updateSection,
-    deleteSection,
-    addSection,
     currentPage,
   } = useSiteEditor();
 
@@ -79,7 +74,7 @@ export const SiteEditorEnhanced = () => {
               onPageSelect={setActivePage}
               onAddPage={() => {}}
             />
-            <SectionEditor onAddSection={addSection} />
+            <SectionEditor onAddSection={() => {}} />
             <CDNPanel />
             <DeploymentPanel
               deploymentStatus={deploymentStatus}
@@ -120,9 +115,8 @@ export const SiteEditorEnhanced = () => {
             <div className="border-t pt-4">
               <h3 className="text-base font-semibold mb-4">Sections</h3>
               <div className="space-y-4">
-                {currentPage?.sections?.map((section: Section, index: number) => (
+                {currentPage?.sections?.map((section: any) => (
                   <div key={section.id}>
-                    {/* Section editor content would go here */}
                     <div className="p-4 border rounded">
                       <p className="font-medium capitalize">{section.type}</p>
                       <p className="text-sm text-slate-500">Section editor placeholder</p>
