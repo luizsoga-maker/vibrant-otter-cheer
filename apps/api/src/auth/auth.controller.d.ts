@@ -7,6 +7,8 @@ export declare class AuthController {
         password: string;
         name?: string;
     }): Promise<{
+        success: boolean;
+        message: string;
         user: any;
         token: string;
     }>;
@@ -14,11 +16,9 @@ export declare class AuthController {
         email: string;
         password: string;
     }): Promise<{
+        success: boolean;
+        message: string;
         user: any;
         token: string;
     }>;
-    logout(req: any): Promise<{
-        message: string;
-    }>;
-    me(req: any): Promise<any>;
 }
