@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OpenAI } from 'openai';
+import OpenAI from 'openai';
 import { AiProvider, AiRequestDto, AiResponseDto } from '../ai.provider';
 
 @Injectable()
@@ -74,32 +74,75 @@ Return ONLY valid JSON in this exact format:
           {
             "type": "hero",
             "props": {
-              "title": "Welcome to [Name]",
-              "subtitle": "[Profession] in [City]",
+              "title": "Welcome to ${request.name}",
+              "subtitle": "${request.profession} in ${request.city}",
               "ctaText": "Book Appointment",
               "ctaLink": "/contact"
             }
           },
-          // ... other sections
+          {
+            "type": "about",
+            "props": {
+              "title": "About Me",
+              "description": "Professional description here",
+              "features": [
+                { "icon": "graduation-cap", "title": "Qualified", "description": "Certified professional" },
+                { "icon": "heart", "title": "Compassionate", "description": "Patient-centered care" }
+              ]
+            }
+          },
+          {
+            "type": "services",
+            "props": {
+              "title": "Services",
+              "services": [
+                { "icon": "stethoscope", "title": "${request.specialty}", "description": "Comprehensive care" }
+              ]
+            }
+          },
+          {
+            "type": "testimonials",
+            "props": {
+              "title": "Patient Testimonials",
+              "testimonials": [
+                { "name": "Patient", "role": "Patient", "text": "Excellent care!" }
+              ]
+            }
+          },
+          {
+            "type": "contact",
+            "props": {
+              "title": "Contact",
+              "phone": "${request.whatsapp}",
+              "email": "contact@example.com",
+              "address": "${request.address}",
+              "whatsapp": "${request.whatsapp}",
+              "socialLinks": ${JSON.stringify(request.socialLinks.map(link => ({ platform: link.split('.')[0], url: link })))}
+            }
+          }
         ]
       }
     ]
   },
   "texts": {
-    "title": "SEO Title",
-    "description": "SEO Description",
+    "title": "${request.name} - ${request.profession} in ${request.city}",
+    "description": "Professional ${request.profession} specializing in ${request.specialty} in ${request.city}",
     "services": [
-      { "icon": "stethoscope", "title": "Service 1", "description": "Description" }
+      { "icon": "stethoscope", "title": "${request.specialty}", "description": "Comprehensive healthcare services" }
     ],
     "testimonials": [
-      { "name": "Patient", "role": "Patient", "text": "Testimonial" }
+      { "name": "Jane Smith", "role": "Patient", "text": "Amazing experience! Highly recommended!" }
     ]
   },
   "seo": {
-    "title": "Page Title",
-    "description": "Meta description"
+    "title": "${request.name} | ${request.profession} in ${request.city}",
+    "description": "Book an appointment with ${request.name}, a professional ${request.profession} in ${request.city}."
   },
-  "imageSuggestions": ["url1", "url2", "url3"]
+  "imageSuggestions": [
+    "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80",
+    "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80",
+    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80"
+  ]
 }
 `;
   }

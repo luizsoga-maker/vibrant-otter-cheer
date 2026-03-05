@@ -1,9 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { SitesService } from './sites.service';
-import { Site } from '../prisma/site.entity';
-import { Page } from '../prisma/page.entity';
-import { Section } from '../prisma/section.entity';
-import { Asset } from '../prisma/asset.entity';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { UpdateSiteDto } from './dto/update-site.dto';
 

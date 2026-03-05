@@ -21,8 +21,7 @@ export class AuthService {
       data: {
         email,
         name,
-        // Note: In a real app, you'd have a separate UserCredentials model
-        // For simplicity, we're storing password hash directly
+        passwordHash: hashedPassword,
       },
     });
 
@@ -36,8 +35,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // In production, you'd verify password hash here
-    // For now, we'll just check if user exists (simplified)
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
     const token = this.jwtService.sign({ sub: user.id, email: user.email });
     return { user, token };

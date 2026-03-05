@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import * as AWS from 'aws-sdk';
+import AWS from 'aws-sdk';
 import * as path from 'path';
 
 @Injectable()

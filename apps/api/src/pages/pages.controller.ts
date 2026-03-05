@@ -1,8 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Param } from '@nestjs/common';
 import { PagesService } from './pages.service';
-import { Page } from './page.entity';
-import { CreatePageDto } from './create-page.dto';
-import { UpdatePageDto } from './update-page.dto';
+import { CreatePageDto } from './dto/create-page.dto';
+import { UpdatePageDto } from './dto/update-page.dto';
 
 @Controller('pages')
 export class PagesController {

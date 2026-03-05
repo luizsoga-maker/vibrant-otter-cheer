@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { AiRequestDto, AiResponseDto, SiteStructure } from './ai.request.dto';
+import { AiRequestDto, AiResponseDto } from './ai.request.dto';
 import { AiProvider } from './ai.provider';
 
 @Injectable()
@@ -43,6 +43,7 @@ export class AiService {
     request: AiRequestDto, 
     response: AiResponseDto
   ) {
+    // Create site first
     const site = await this.prisma.site.create({
       data: {
         name: request.name,
@@ -61,18 +62,20 @@ export class AiService {
           },
         },
         status: 'DRAFT',
-        pages: {
-          create: response.siteStructure.pages.map((page) => ({
-            slug: page.slug,
-            title: page.title,
-            sections: page.sections.map((section) => ({
-              type: section.type,
-              props: section.props,
-            })),
-          })),
-        },
       },
     });
+
+    // Create pages for the site
+    for (const page of response.siteStructure.pages) {
+      await this.prisma.page.create({
+        data: {
+          siteId: site.id,
+          slug: page.slug,
+          title: page.title,
+          sections: page.sections, // Store as JSON
+        },
+      });
+    }
 
     return site;
   }
