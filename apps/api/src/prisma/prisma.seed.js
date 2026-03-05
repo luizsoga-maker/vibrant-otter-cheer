@@ -1,0 +1,6 @@
+"use strict";
+// Seed data for development
+// - Create sample users
+// - Create sample sites
+// - Populate test data for AI generation
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHJpc21hLnNlZWQuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJwcmlzbWEuc2VlZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBQUEsNEJBQTRCO0FBQzVCLHdCQUF3QjtBQUN4Qix3QkFBd0I7QUFDeEIseUNBQXlDIiwic291cmNlc0NvbnRlbnQiOlsiLy8gU2VlZCBkYXRhIGZvciBkZXZlbG9wbWVudFxuLy8gLSBDcmVhdGUgc2FtcGxlIHVzZXJzXG4vLyAtIENyZWF0ZSBzYW1wbGUgc2l0ZXNcbi8vIC0gUG9wdWxhdGUgdGVzdCBkYXRhIGZvciBBSSBnZW5lcmF0aW9uIl19

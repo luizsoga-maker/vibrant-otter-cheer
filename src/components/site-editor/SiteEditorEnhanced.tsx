@@ -40,8 +40,7 @@ export const SiteEditorEnhanced = () => {
     setDeploymentTarget,
     saveSite,
     deploySite,
-    updatePageTitle,
-    updatePageSlug,
+    updatePage,
     currentPage,
   } = useSiteEditor();
 
@@ -54,6 +53,18 @@ export const SiteEditorEnhanced = () => {
       </MainLayout>
     );
   }
+
+  const updatePageTitle = (title: string) => {
+    if (currentPage) {
+      updatePage(currentPage.id, { title });
+    }
+  };
+
+  const updatePageSlug = (slug: string) => {
+    if (currentPage) {
+      updatePage(currentPage.id, { slug });
+    }
+  };
 
   return (
     <MainLayout>
@@ -101,7 +112,7 @@ export const SiteEditorEnhanced = () => {
               <Label>Page Title</Label>
               <Input
                 value={currentPage?.title || ''}
-                onChange={(e) => updatePageTitle(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePageTitle(e.target.value)}
               />
             </div>
 
@@ -109,7 +120,7 @@ export const SiteEditorEnhanced = () => {
               <Label>Page Slug</Label>
               <Input
                 value={currentPage?.slug || ''}
-                onChange={(e) => updatePageSlug(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePageSlug(e.target.value)}
               />
             </div>
 
@@ -120,7 +131,9 @@ export const SiteEditorEnhanced = () => {
                   <div key={section.id}>
                     <div className="p-4 border rounded">
                       <p className="font-medium capitalize">{section.type}</p>
-                      <p className="text-sm text-slate-500">Section editor placeholder</p>
+                      <p className="text-sm text-slate-500">
+                        {JSON.stringify(section.props).substring(0, 100)}...
+                      </p>
                     </div>
                   </div>
                 )) || (

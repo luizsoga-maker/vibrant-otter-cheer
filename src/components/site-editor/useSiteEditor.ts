@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '@/utils/toast';
@@ -59,6 +61,14 @@ export const useSiteEditor = () => {
             title: page.title,
             slug: page.slug,
             sections: page.sections,
+            seo: page.seo,
+            analytics: page.analytics,
+            forms: page.forms,
+            blog: page.blog,
+            multilang: page.multilang,
+            caching: page.caching,
+            apiIntegrations: page.apiIntegrations,
+            collaboration: page.collaboration,
           }),
         });
       }
@@ -70,13 +80,20 @@ export const useSiteEditor = () => {
     }
   };
 
+  const updatePage = async (pageId: string, updates: Partial<Page>) => {
+    setPages(prev => prev.map(page => 
+      page.id === pageId ? { ...page, ...updates } : page
+    ));
+  };
+
   const deploySite = async () => {
     try {
       setDeploymentStatus('deploying');
       setDeploymentProgress(0);
 
+      // Simulate deployment progress
       for (let i = 0; i <= 100; i += 10) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
         setDeploymentProgress(i);
       }
 
@@ -139,6 +156,7 @@ export const useSiteEditor = () => {
     fetchSite,
     saveSite,
     deploySite,
+    updatePage,
     updatePageTitle,
     updatePageSlug,
     updateSection,

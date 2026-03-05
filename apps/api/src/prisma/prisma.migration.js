@@ -1,0 +1,6 @@
+"use strict";
+// Migration for v1.0.0
+// - Create initial tables
+// - Add foreign keys
+// - Set default values
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHJpc21hLm1pZ3JhdGlvbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbInByaXNtYS5taWdyYXRpb24udHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IjtBQUFBLHVCQUF1QjtBQUN2QiwwQkFBMEI7QUFDMUIscUJBQXFCO0FBQ3JCLHVCQUF1QiIsInNvdXJjZXNDb250ZW50IjpbIi8vIE1pZ3JhdGlvbiBmb3IgdjEuMC4wXG4vLyAtIENyZWF0ZSBpbml0aWFsIHRhYmxlc1xuLy8gLSBBZGQgZm9yZWlnbiBrZXlzXG4vLyAtIFNldCBkZWZhdWx0IHZhbHVlcyJdfQ==
