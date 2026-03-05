@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ExternalLink } from 'lucide-react';
 
 interface Site {
   id: number;
@@ -301,9 +301,12 @@ export const SitePreview = () => {
             }}
           >
             <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
+              <h2 className="text-3xl font-bold text-center mb-4" style={{ color: theme.colors.primary }}>
                 {props.title}
               </h2>
+              {props.subtitle && (
+                <p className="text-center text-lg mb-12 opacity-80">{props.subtitle}</p>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {props.plans?.map((plan: any, idx: number) => (
                   <div 
@@ -466,7 +469,10 @@ export const SitePreview = () => {
               fontFamily: theme.typography.fontFamily,
             }}
           >
-            <p>Unknown section type: {type}</p>
+            <div className="max-w-4xl mx-auto text-center">
+              <p className="text-lg">Unknown section type: {type}</p>
+              <p className="text-sm opacity-60 mt-2">This section type is not yet supported in preview.</p>
+            </div>
           </section>
         );
     }
