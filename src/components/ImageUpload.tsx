@@ -30,6 +30,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   const [uploading, setUploading] = useState(false);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loadingAssets, setLoadingAssets] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,11 +64,22 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       const asset = await response.json();
       onImageSelect(asset.url);
       showSuccess('Image uploaded successfully');
-      fetchAssets(); // Refresh asset list
+      fetchAssets();
     } catch (error) {
       showError('Failed to upload image');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const fakeEvent = { target: { files: [file] } } as any;
+      handleFileUpload(fakeEvent);
     }
   };
 
@@ -123,88 +135,77 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           </div>
         )}
 
-        {/* Upload Button */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              disabled={uploading}
-              className="hidden"
-              id="image-upload"
-            />
-            <Label
-              htmlFor="image-upload"
-              className="flex items-center justify-center w-full p-2 border-2 border-dashed rounded-lg cursor-pointer hover:bg-slate-50"
-            >
-              {uploading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Choose File
-                </>
-              )}
-            </Label>
+        {/* Upload Area */}
+        <div 
+          className={`relative flex-1 border-2 rounded-lg transition-colors ${
+            dragOver ? 'border-blue-500 bg-blue-50' : 'border-dashed'
+          }`}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+          onDrop={handleDrop}
+        >
+          <div className="flex items-center justify-center w-full p-4">
+            <div className="text-center">
+              <Upload className="h-8 w-8 mx-auto mb-2 text-slate-400" />
+              <p className="text-sm text-slate-600">
+                {uploading ? 'Uploading...' : 'Drag & drop or click to upload'}
+              </p>
+              <p className="text-xs text-slate-400 mt-1">Max 5MB</p>
+            </div>
           </div>
+          <Input
+            type="file"
+            accept="image/*"
+            onChange={handleFileUpload}
+            disabled={uploading}
+            className="absolute inset-0 opacity-0 cursor-pointer"
+          />
+        </div>
+
+        {/* Asset Library */}
+        <div className="space-y-2">
+          <Label>Asset Library</Label>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => document.getElementById('image-upload')?.click()}
-            disabled={uploading}
+            onClick={fetchAssets}
+            disabled={loadingAssets}
+            className="w-full"
           >
-            {currentImage ? 'Change' : 'Upload'}
+            {loadingAssets ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              <>
+                <ImageIcon className="h-4 w-4 mr-2" />
+                Browse Assets
+              </>
+            )}
           </Button>
-        </div>
-      </div>
 
-      {/* Asset Library */}
-      <div className="space-y-2">
-        <Label>Asset Library</Label>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={fetchAssets}
-          disabled={loadingAssets}
-          className="w-full"
-        >
-          {loadingAssets ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Loading...
-            </>
-          ) : (
-            <>
-              <ImageIcon className="h-4 w-4 mr-2" />
-              Browse Assets
-            </>
-          )}
-        </Button>
-
-        {assets.length > 0 && (
-          <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 border rounded-lg">
-            {assets.map((asset) => (
-              <div
-                key={asset.id}
-                className="relative group cursor-pointer border rounded overflow-hidden"
-                onClick={() => selectAsset(asset.url)}
-              >
-                <img
-                  src={asset.url}
-                  alt={asset.filename}
-                  className="w-full h-20 object-cover"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <span className="text-white text-xs">Select</span>
+          {assets.length > 0 && (
+            <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 border rounded-lg">
+              {assets.map((asset) => (
+                <div
+                  key={asset.id}
+                  className="relative group cursor-pointer border rounded overflow-hidden"
+                  onClick={() => selectAsset(asset.url)}
+                >
+                  <img
+                    src={asset.url}
+                    alt={asset.filename}
+                    className="w-full h-20 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="text-white text-xs">Select</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
