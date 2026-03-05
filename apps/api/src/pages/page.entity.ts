@@ -1,0 +1,1 @@
+import { Asset } from './asset.entity';

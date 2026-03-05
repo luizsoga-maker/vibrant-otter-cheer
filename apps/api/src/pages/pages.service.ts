@@ -1,0 +1,1 @@
+// Section type is imported via Prisma, no extra import needed
