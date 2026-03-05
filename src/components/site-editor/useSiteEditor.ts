@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '@/utils/toast';
+import { API_BASE_URL } from '@/config';
 import type { Site, Page, Section } from './types';
 
 export const useSiteEditor = () => {
@@ -20,7 +21,7 @@ export const useSiteEditor = () => {
     if (!id) return;
     
     try {
-      const response = await fetch(`http://localhost:3000/api/sites/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/sites/${id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -48,7 +49,7 @@ export const useSiteEditor = () => {
     setSaving(true);
     try {
       for (const page of pages) {
-        await fetch(`http://localhost:3000/api/pages/${page.id}`, {
+        await fetch(`${API_BASE_URL}/api/pages/${page.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
