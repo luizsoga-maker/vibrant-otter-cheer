@@ -1,6 +1,5 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -17,14 +16,14 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards()
   async logout(@Request() req: any) {
     // In a real app, you might want to blacklist the token
     return { message: 'Logged out successfully' };
   }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards()
   async me(@Request() req: any) {
     return req.user;
   }

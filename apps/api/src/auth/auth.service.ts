@@ -47,7 +47,9 @@ export class AuthService {
   async validateUser(token: string) {
     try {
       const payload = await this.jwtService.verify(token);
-      return await this.prisma.user.findUnique({ where: { id: payload.sub } });
+      return await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+      }) as any;
     } catch (error) {
       return null;
     }
