@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { showSuccess, showError } from '@/utils/toast';
+import { API_ENDPOINTS } from '@/config';
 
 export const AIGenerator = () => {
   const [loading, setLoading] = useState(false);
@@ -30,7 +31,7 @@ export const AIGenerator = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/ai/generate', {
+      const response = await fetch(API_ENDPOINTS.AI_GENERATE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,13 +50,16 @@ export const AIGenerator = () => {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to generate site');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to generate site');
+      }
       
       const data = await response.json();
       showSuccess('Website generated successfully!');
       navigate('/dashboard');
-    } catch (error) {
-      showError('Failed to generate website');
+    } catch (error: any) {
+      showError(error.message || 'Failed to generate website');
     } finally {
       setLoading(false);
     }
