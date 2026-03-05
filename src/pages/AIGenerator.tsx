@@ -2,18 +2,17 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { showSuccess, showError } from '@/utils/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { showSuccess, showError, showLoading } from '@/utils/toast';
-import { Wand2, Loader2 } from 'lucide-react';
+import { useSite } from '@/hooks/useSite';
 
 export const AIGenerator = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     profession: '',
@@ -26,12 +25,13 @@ export const AIGenerator = () => {
     socialLinks: '',
     tone: 'professional',
   });
+  const { user, login, signup } = useAuth();
+  const navigate = useNavigate();
+  const { site, setSite } = useSite();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    const toastId = showLoading('Generating your website with AI...');
 
     try {
       const response = await fetch('http://localhost:3000/api/ai/generate', {
@@ -41,70 +41,26 @@ export const AIGenerator = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
-          ...formData,
-          socialLinks: formData.socialLinks.split('\n').filter(link => link.trim()),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate site');
-      }
-
-      const data = await response.json();
-      
-      // Create site with generated data
-      const siteResponse = await fetch('http://localhost:3000/api/sites', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
+          profession: formData.profession,
           name: formData.name,
-          slug: formData.name.toLowerCase().replace(/\s+/g, '-'),
-          theme: {
-            colors: {
-              primary: '#3b82f6',
-              secondary: '#10b981',
-              background: '#ffffff',
-              text: '#333333',
-            },
-            typography: {
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '16px',
-              lineHeight: '1.6',
-            },
-          },
+          city: formData.city,
+          specialty: formData.specialty,
+          whatsapp: formData.whatsapp,
+          address: formData.address,
+          hours: formData.hours,
+          socialLinks: formData.socialLinks.split('\n').filter(link => link.trim()),
+          tone: formData.tone,
         }),
       });
 
-      if (!siteResponse.ok) {
-        throw new Error('Failed to create site');
-      }
-
-      const site = await siteResponse.json();
+      if (!response.ok) throw new Error('Failed to generate site');
       
-      // Create pages for the site
-      for (const page of data.siteStructure.pages) {
-        await fetch(`http://localhost:3000/api/pages`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: JSON.stringify({
-            siteId: site.id,
-            slug: page.slug,
-            title: page.title,
-            sections: page.sections,
-          }),
-        });
-      }
-
+      const data = await response.json();
+      setSite(data);
       showSuccess('Website generated successfully!');
       navigate('/dashboard');
     } catch (error) {
-      showError('Failed to generate website. Please try again.');
+      showError('Failed to generate website');
     } finally {
       setLoading(false);
     }
@@ -112,150 +68,114 @@ export const AIGenerator = () => {
 
   return (
     <MainLayout>
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Wand2 className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">AI Website Generator</h1>
-          <p className="text-slate-600">
-            Describe your business and our AI will create a complete website for you in seconds.
-          </p>
-        </div>
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-500 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0l8 8m0-8l8 8M9 12l8 8-8 8M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10l2-2M0 0l8 8m2-2h10lI see the issue - the file extension needs to be `.tsx` for JSX syntax. Let me fix this:
 
-        <Card>
-          <form onSubmit={handleSubmit}>
-            <CardHeader>
-              <CardTitle>Business Details</CardTitle>
-              <CardDescription>
-                Fill in your business information and our AI will generate a professional website.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Business Name *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="profession">Profession *</Label>
-                  <Input
-                    id="profession"
-                    value={formData.profession}
-                    onChange={(e) => setFormData({...formData, profession: e.target.value})}
-                    placeholder="e.g., Doctor, Lawyer, Consultant"
-                    required
-                  />
-                </div>
-              </div>
+<dyad-rename from="src/hooks/useAuth.ts" to="src/hooks/useAuth.tsx"></dyad-rename>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="city">City *</Label>
-                  <Input
-                    id="city"
-                    value={formData.city}
-                    onChange={(e) => setFormData({...formData, city: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="specialty">Specialty *</Label>
-                  <Input
-                    id="specialty"
-                    value={formData.specialty}
-                    onChange={(e) => setFormData({...formData, specialty: e.target.value})}
-                    required
-                  />
-                </div>
-              </div>
+<dyad-write path="src/hooks/useAuth.tsx" description="Fixed auth hook with proper TypeScript JSX syntax">
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-              <div className="space-y-2">
-                <Label htmlFor="whatsapp">WhatsApp Number *</Label>
-                <Input
-                  id="whatsapp"
-                  value={formData.whatsapp}
-                  onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
-                  placeholder="+1 (555) 000-0000"
-                  required
-                />
-              </div>
+interface User {
+  id: string;
+  email: string;
+  name?: string;
+  avatar?: string;
+}
 
-              <div className="space-y-2">
-                <Label htmlFor="address">Address *</Label>
-                <Textarea
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData({...formData, address: e.target.value})}
-                  rows={2}
-                  required
-                />
-              </div>
+interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, name?: string) => Promise<void>;
+  logout: () => void;
+  loading: boolean;
+}
 
-              <div className="space-y-2">
-                <Label htmlFor="hours">Business Hours *</Label>
-                <Input
-                  id="hours"
-                  value={formData.hours}
-                  onChange={(e) => setFormData({...formData, hours: e.target.value})}
-                  placeholder="Mon-Fri: 9AM - 5PM"
-                  required
-                />
-              </div>
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-              <div className="space-y-2">
-                <Label htmlFor="socialLinks">Social Media Links (one per line)</Label>
-                <Textarea
-                  id="socialLinks"
-                  value={formData.socialLinks}
-                  onChange={(e) => setFormData({...formData, socialLinks: e.target.value})}
-                  rows={3}
-                  placeholder="https://facebook.com/yourbusiness&#10;https://instagram.com/yourbusiness&#10;https://linkedin.com/company/yourbusiness"
-                />
-              </div>
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
-              <div className="space-y-2">
-                <Label htmlFor="tone">Tone of Voice</Label>
-                <Select 
-                  value={formData.tone} 
-                  onValueChange={(value) => setFormData({...formData, tone: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select tone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="professional">Professional</SelectItem>
-                    <SelectItem value="friendly">Friendly</SelectItem>
-                    <SelectItem value="modern">Modern</SelectItem>
-                    <SelectItem value="luxury">Luxury</SelectItem>
-                    <SelectItem value="casual">Casual</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating Website...
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="mr-2 h-4 w-4" />
-                    Generate My Website
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
-      </div>
-    </MainLayout>
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (token && userData) {
+      setUser(JSON.parse(userData));
+    }
+    setLoading(false);
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+      navigate('/dashboard');
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const signup = async (email: string, password: string, name?: string) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Signup failed');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+      navigate('/dashboard');
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    navigate('/');
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, signup, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
   );
 };

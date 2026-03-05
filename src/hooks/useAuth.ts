@@ -1,6 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'react-router-dom';
+import { PrismaClient } from '@prisma/client';
 import { toast } from 'sonner';
+
+const prisma = new PrismaClient();
 
 interface User {
   id: string;
@@ -30,7 +33,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -56,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
-      navigate('/dashboard');
+      router.push('/dashboard');
     } catch (error) {
       throw error;
     }
@@ -76,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
-      navigate('/dashboard');
+      router.push('/dashboard');
     } catch (error) {
       throw error;
     }
@@ -86,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
-    navigate('/');
+    router.push('/');
   };
 
   return (
