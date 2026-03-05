@@ -3,24 +3,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { 
-  SiteEditorHeader, 
-  SiteEditorLayout, 
-  PageManager, 
-  SectionEditor,
-  CDNPanel,
-  DeploymentPanel,
-  EcommercePanel,
-  MembershipPanel,
-  BlogPanel,
-  FormsPanel,
-  MultilangPanel,
-  AnalyticsPanel,
-  ApiIntegrationsPanel,
-  CachingPanel,
-  CollaborationPanel,
-  SEOPanel
-} from './site-editor';
+import SiteEditorHeader from './site-editor/SiteEditorHeader';
+import SiteEditorLayout from './site-editor/SiteEditorLayout';
+import PageManager from './site-editor/PageManager';
+import SectionEditor from './site-editor/SectionEditor';
+import CDNPanel from './site-editor/panels/CDNPanel';
+import DeploymentPanel from './site-editor/panels/DeploymentPanel';
+import EcommercePanel from './site-editor/panels/EcommercePanel';
+import MembershipPanel from './site-editor/panels/MembershipPanel';
+import BlogPanel from './site-editor/panels/BlogPanel';
+import FormsPanel from './site-editor/panels/FormsPanel';
+import MultilangPanel from './site-editor/panels/MultilangPanel';
+import AnalyticsPanel from './site-editor/panels/AnalyticsPanel';
+import ApiIntegrationsPanel from './site-editor/panels/ApiIntegrationsPanel';
+import CachingPanel from './site-editor/panels/CachingPanel';
+import CollaborationPanel from './site-editor/panels/CollaborationPanel';
+import SEOPanel from './site-editor/panels/SEOPanel';
 import { useSiteEditor } from './site-editor/useSiteEditor';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
