@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import Index from './pages/Index';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard';
-import AIGenerator from './pages/AIGenerator';
-import SiteEditor from './pages/SiteEditor';
-import NotFound from './pages/NotFound';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
+import { Dashboard } from './pages/Dashboard';
+import { AIGenerator } from './pages/AIGenerator';
+import { SiteEditor } from './pages/SiteEditor';
+import { NotFound } from './pages/NotFound';
 
 const App = () => {
   return (
