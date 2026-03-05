@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { showSuccess, showError } from '@/utils/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/hooks/useAuth';
-import { showSuccess, showError } from '@/utils/toast';
+import { Logo } from '@/components/Logo';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -77,9 +78,9 @@ export const Login = () => {
             </Button>
             <div className="text-center text-sm text-muted-foreground">
               Don't have an account?{' '}
-              <Link to="/signup" className="text-blue-600 hover:underline">
+              <a href="/signup" className="text-blue-600 hover:underline">
                 Sign up
-              </Link>
+              </a>
             </div>
           </CardFooter>
         </form>
@@ -87,3 +88,5 @@ export const Login = () => {
     </div>
   );
 };
+
+export default Login;

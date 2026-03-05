@@ -1,6 +1,4 @@
-"use client";
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'react-router-dom';
 
 interface User {
