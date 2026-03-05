@@ -19,10 +19,11 @@ import {
   CachingPanel,
   CollaborationPanel,
   SEOPanel
-} from './';
+} from './index';
 import { useSiteEditor } from './useSiteEditor';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import type { Section } from './types';
 
 export const SiteEditorEnhanced = () => {
   const navigate = useNavigate();
@@ -115,7 +116,7 @@ export const SiteEditorEnhanced = () => {
             <div className="border-t pt-4">
               <h3 className="text-base font-semibold mb-4">Sections</h3>
               <div className="space-y-4">
-                {currentPage?.sections?.map((section: any) => (
+                {currentPage?.sections?.map((section: Section) => (
                   <div key={section.id}>
                     <div className="p-4 border rounded">
                       <p className="font-medium capitalize">{section.type}</p>
