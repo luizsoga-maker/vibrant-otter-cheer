@@ -155,12 +155,14 @@ function getDefaultProps(type: string): Record<string, any> {
         subtitle: 'Your subtitle here',
         ctaText: 'Call to Action',
         ctaLink: '/contact',
+        backgroundImage: '',
       };
     case 'about':
       return {
         title: 'About Us',
         description: 'Tell your story here...',
         features: [],
+        image: '',
       };
     case 'services':
       return {
@@ -180,6 +182,7 @@ function getDefaultProps(type: string): Record<string, any> {
         address: '',
         whatsapp: '',
         socialLinks: [],
+        mapEmbed: '',
       };
     default:
       return {};

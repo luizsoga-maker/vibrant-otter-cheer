@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Image as ImageIcon } from 'lucide-react';
+import { ImageUpload } from '@/components/ImageUpload';
 
 interface Section {
   id: string;
@@ -60,6 +61,23 @@ SectionEditor.Item = ({ section, pageIndex, sectionIndex, onUpdate, onDelete }) 
     onUpdate(pageIndex, sectionIndex, { ...props, [field]: value });
   };
 
+  const handleArrayChange = (field: string, index: number, value: any) => {
+    const newArray = [...(props[field] || [])];
+    newArray[index] = value;
+    handleChange(field, newArray);
+  };
+
+  const addArrayItem = (field: string, defaultItem: any) => {
+    const newArray = [...(props[field] || []), defaultItem];
+    handleChange(field, newArray);
+  };
+
+  const removeArrayItem = (field: string, index: number) => {
+    const newArray = [...(props[field] || [])];
+    newArray.splice(index, 1);
+    handleChange(field, newArray);
+  };
+
   const renderFields = () => {
     switch (type) {
       case 'hero':
@@ -93,6 +111,14 @@ SectionEditor.Item = ({ section, pageIndex, sectionIndex, onUpdate, onDelete }) 
                 onChange={(e) => handleChange('ctaLink', e.target.value)}
               />
             </div>
+            <div className="space-y-2">
+              <Label>Background Image</Label>
+              <ImageUpload
+                onImageSelect={(url) => handleChange('backgroundImage', url)}
+                currentImage={props.backgroundImage}
+                label="Upload background image"
+              />
+            </div>
           </>
         );
 
@@ -114,28 +140,173 @@ SectionEditor.Item = ({ section, pageIndex, sectionIndex, onUpdate, onDelete }) 
                 rows={4}
               />
             </div>
+            <div className="space-y-2">
+              <Label>Features</Label>
+              {props.features?.map((feature: any, idx: number) => (
+                <div key={idx} className="space-y-2 p-3 border rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Feature {idx + 1}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeArrayItem('features', idx)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    <Input
+                      value={feature.title || ''}
+                      onChange={(e) => handleArrayChange('features', idx, { ...feature, title: e.target.value })}
+                      placeholder="Title"
+                    />
+                    <Textarea
+                      value={feature.description || ''}
+                      onChange={(e) => handleArrayChange('features', idx, { ...feature, description: e.target.value })}
+                      rows={2}
+                      placeholder="Description"
+                    />
+                  </div>
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => addArrayItem('features', { title: '', description: '' })}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Feature
+              </Button>
+            </div>
+            <div className="space-y-2">
+              <Label>Image</Label>
+              <ImageUpload
+                onImageSelect={(url) => handleChange('image', url)}
+                currentImage={props.image}
+                label="Upload about image"
+              />
+            </div>
           </>
         );
 
       case 'services':
         return (
-          <div className="space-y-2">
-            <Label>Services (one per line, format: Title:Description)</Label>
-            <Textarea
-              value={props.services?.map((s: any) => `${s.title}:${s.description}`).join('\n') || ''}
-              onChange={(e) => {
-                const services = e.target.value.split('\n')
-                  .filter(line => line.trim())
-                  .map(line => {
-                    const [title, description] = line.split(':');
-                    return { title: title?.trim() || '', description: description?.trim() || '' };
-                  });
-                handleChange('services', services);
-              }}
-              rows={4}
-              placeholder="Service Title:Description"
-            />
-          </div>
+          <>
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <Input
+                value={props.title || ''}
+                onChange={(e) => handleChange('title', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Services</Label>
+              {props.services?.map((service: any, idx: number) => (
+                <div key={idx} className="space-y-2 p-3 border rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Service {idx + 1}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeArrayItem('services', idx)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    <Input
+                      value={service.title || ''}
+                      onChange={(e) => handleArrayChange('services', idx, { ...service, title: e.target.value })}
+                      placeholder="Service title"
+                    />
+                    <Textarea
+                      value={service.description || ''}
+                      onChange={(e) => handleArrayChange('services', idx, { ...service, description: e.target.value })}
+                      rows={2}
+                      placeholder="Description"
+                    />
+                    <Input
+                      value={service.price || ''}
+                      onChange={(e) => handleArrayChange('services', idx, { ...service, price: e.target.value })}
+                      placeholder="Price (optional)"
+                    />
+                  </div>
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => addArrayItem('services', { title: '', description: '', price: '' })}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Service
+              </Button>
+            </div>
+          </>
+        );
+
+      case 'testimonials':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <Input
+                value={props.title || ''}
+                onChange={(e) => handleChange('title', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Testimonials</Label>
+              {props.testimonials?.map((testimonial: any, idx: number) => (
+                <div key={idx} className="space-y-2 p-3 border rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Testimonial {idx + 1}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeArrayItem('testimonials', idx)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    <Input
+                      value={testimonial.name || ''}
+                      onChange={(e) => handleArrayChange('testimonials', idx, { ...testimonial, name: e.target.value })}
+                      placeholder="Name"
+                    />
+                    <Input
+                      value={testimonial.role || ''}
+                      onChange={(e) => handleArrayChange('testimonials', idx, { ...testimonial, role: e.target.value })}
+                      placeholder="Role"
+                    />
+                    <Textarea
+                      value={testimonial.text || ''}
+                      onChange={(e) => handleArrayChange('testimonials', idx, { ...testimonial, text: e.target.value })}
+                      rows={3}
+                      placeholder="Testimonial text"
+                    />
+                    <div className="space-y-2">
+                      <Label>Avatar Image</Label>
+                      <ImageUpload
+                        onImageSelect={(url) => handleArrayChange('testimonials', idx, { ...testimonial, avatar: url })}
+                        currentImage={testimonial.avatar}
+                        label="Upload avatar"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => addArrayItem('testimonials', { name: '', role: '', text: '', avatar: '' })}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Testimonial
+              </Button>
+            </div>
+          </>
         );
 
       case 'contact':
@@ -168,6 +339,62 @@ SectionEditor.Item = ({ section, pageIndex, sectionIndex, onUpdate, onDelete }) 
                 value={props.address || ''}
                 onChange={(e) => handleChange('address', e.target.value)}
                 rows={2}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>WhatsApp</Label>
+              <Input
+                value={props.whatsapp || ''}
+                onChange={(e) => handleChange('whatsapp', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Social Links</Label>
+              {props.socialLinks?.map((link: any, idx: number) => (
+                <div key={idx} className="flex gap-2">
+                  <Input
+                    value={link.platform || ''}
+                    onChange={(e) => {
+                      const newLinks = [...props.socialLinks];
+                      newLinks[idx] = { ...link, platform: e.target.value };
+                      handleChange('socialLinks', newLinks);
+                    }}
+                    placeholder="Platform (e.g., Facebook)"
+                  />
+                  <Input
+                    value={link.url || ''}
+                    onChange={(e) => {
+                      const newLinks = [...props.socialLinks];
+                      newLinks[idx] = { ...link, url: e.target.value };
+                      handleChange('socialLinks', newLinks);
+                    }}
+                    placeholder="URL"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeArrayItem('socialLinks', idx)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => addArrayItem('socialLinks', { platform: '', url: '' })}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Social Link
+              </Button>
+            </div>
+            <div className="space-y-2">
+              <Label>Map Embed (optional)</Label>
+              <Textarea
+                value={props.mapEmbed || ''}
+                onChange={(e) => handleChange('mapEmbed', e.target.value)}
+                rows={3}
+                placeholder="Paste Google Maps embed code"
               />
             </div>
           </>
