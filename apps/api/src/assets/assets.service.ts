@@ -40,4 +40,13 @@ export class AssetsService {
 
     return asset;
   }
+
+  async getAllAssets() {
+    return this.prisma.asset.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 50,
+    });
+  }
 }

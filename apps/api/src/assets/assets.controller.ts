@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Get, UseGuards, UploadedFile, BadRequestException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AssetsService } from './assets.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -21,5 +21,11 @@ export class AssetsController {
     }
 
     return this.assetsService.uploadFile(file);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async getAllAssets() {
+    return this.assetsService.getAllAssets();
   }
 }

@@ -52,6 +52,16 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
                 >
                   AI Generator
                 </Link>
+                <Link
+                  to="/assets"
+                  className={`text-sm font-medium transition-colors ${
+                    isActive('/assets')
+                      ? 'text-blue-600'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Assets
+                </Link>
               </nav>
             </div>
 

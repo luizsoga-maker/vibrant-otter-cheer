@@ -7,6 +7,7 @@ import { Dashboard } from './pages/Dashboard';
 import { AIGenerator } from './pages/AIGenerator';
 import { SiteEditorEnhanced } from './components/SiteEditorEnhanced';
 import { SitePreview } from './pages/SitePreview';
+import { Assets } from './pages/Assets';
 import NotFound from './pages/NotFound';
 
 const App = () => {
@@ -21,6 +22,7 @@ const App = () => {
           <Route path="/ai-generator" element={<AIGenerator />} />
           <Route path="/sites/:id/edit" element={<SiteEditorEnhanced />} />
           <Route path="/sites/:id" element={<SitePreview />} />
+          <Route path="/assets" element={<Assets />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
