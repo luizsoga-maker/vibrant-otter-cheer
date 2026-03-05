@@ -9,7 +9,7 @@ import { Plus, Trash2 } from 'lucide-react';
 interface Section {
   id: string;
   type: string;
-  props: Record<string, any>;
+  props: any;
 }
 
 interface SectionEditorProps {
@@ -20,7 +20,7 @@ interface SectionEditorItemProps {
   section: Section;
   pageIndex: number;
   sectionIndex: number;
-  onUpdate: (pageIndex: number, sectionIndex: number, props: Record<string, any>) => void;
+  onUpdate: (pageIndex: number, sectionIndex: number, props: any) => void;
   onDelete: (pageIndex: number, sectionIndex: number) => void;
 }
 
