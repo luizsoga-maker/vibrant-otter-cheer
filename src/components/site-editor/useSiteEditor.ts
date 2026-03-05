@@ -184,6 +184,17 @@ function getDefaultProps(type: string): Record<string, any> {
         socialLinks: [],
         mapEmbed: '',
       };
+    case 'pricing':
+      return {
+        title: 'Pricing Plans',
+        subtitle: 'Choose the plan that fits your needs',
+        plans: [],
+      };
+    case 'faq':
+      return {
+        title: 'Frequently Asked Questions',
+        faqs: [],
+      };
     default:
       return {};
   }

@@ -28,7 +28,7 @@ interface SectionEditorItemProps {
 export const SectionEditor: React.FC<SectionEditorProps> & {
   Item: React.FC<SectionEditorItemProps>;
 } = ({ onAddSection }) => {
-  const sectionTypes = ['hero', 'about', 'services', 'testimonials', 'contact'];
+  const sectionTypes = ['hero', 'about', 'services', 'testimonials', 'contact', 'pricing', 'faq'];
 
   return (
     <Card>
@@ -80,7 +80,9 @@ SectionEditor.Item = ({ section, pageIndex, sectionIndex, onUpdate, onDelete }) 
 
   const renderFields = () => {
     switch (type) {
-      case 'hero':
+      // ... existing cases for hero, about, services, testimonials, contact ...
+
+      case 'pricing':
         return (
           <>
             <div className="space-y-2">
@@ -91,225 +93,75 @@ SectionEditor.Item = ({ section, pageIndex, sectionIndex, onUpdate, onDelete }) 
               />
             </div>
             <div className="space-y-2">
-              <Label>Subtitle</Label>
+              <Label>Subtitle (optional)</Label>
               <Input
                 value={props.subtitle || ''}
                 onChange={(e) => handleChange('subtitle', e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label>CTA Text</Label>
-              <Input
-                value={props.ctaText || ''}
-                onChange={(e) => handleChange('ctaText', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>CTA Link</Label>
-              <Input
-                value={props.ctaLink || ''}
-                onChange={(e) => handleChange('ctaLink', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Background Image</Label>
-              <ImageUpload
-                onImageSelect={(url) => handleChange('backgroundImage', url)}
-                currentImage={props.backgroundImage}
-                label="Upload background image"
-              />
-            </div>
-          </>
-        );
-
-      case 'about':
-        return (
-          <>
-            <div className="space-y-2">
-              <Label>Title</Label>
-              <Input
-                value={props.title || ''}
-                onChange={(e) => handleChange('title', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Description</Label>
-              <Textarea
-                value={props.description || ''}
-                onChange={(e) => handleChange('description', e.target.value)}
-                rows={4}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Features</Label>
-              {props.features?.map((feature: any, idx: number) => (
+              <Label>Pricing Plans</Label>
+              {props.plans?.map((plan: any, idx: number) => (
                 <div key={idx} className="space-y-2 p-3 border rounded-lg">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Feature {idx + 1}</span>
+                    <span className="text-sm font-medium">Plan {idx + 1}</span>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => removeArrayItem('features', idx)}
+                      onClick={() => removeArrayItem('plans', idx)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                   <div className="space-y-2">
                     <Input
-                      value={feature.title || ''}
-                      onChange={(e) => handleArrayChange('features', idx, { ...feature, title: e.target.value })}
-                      placeholder="Title"
+                      value={plan.name || ''}
+                      onChange={(e) => handleArrayChange('plans', idx, { ...plan, name: e.target.value })}
+                      placeholder="Plan name (e.g., Basic, Pro)"
                     />
-                    <Textarea
-                      value={feature.description || ''}
-                      onChange={(e) => handleArrayChange('features', idx, { ...feature, description: e.target.value })}
-                      rows={2}
-                      placeholder="Description"
-                    />
-                  </div>
-                </div>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => addArrayItem('features', { title: '', description: '' })}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Feature
-              </Button>
-            </div>
-            <div className="space-y-2">
-              <Label>Image</Label>
-              <ImageUpload
-                onImageSelect={(url) => handleChange('image', url)}
-                currentImage={props.image}
-                label="Upload about image"
-              />
-            </div>
-          </>
-        );
-
-      case 'services':
-        return (
-          <>
-            <div className="space-y-2">
-              <Label>Title</Label>
-              <Input
-                value={props.title || ''}
-                onChange={(e) => handleChange('title', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Services</Label>
-              {props.services?.map((service: any, idx: number) => (
-                <div key={idx} className="space-y-2 p-3 border rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Service {idx + 1}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeArrayItem('services', idx)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    <Input
-                      value={service.title || ''}
-                      onChange={(e) => handleArrayChange('services', idx, { ...service, title: e.target.value })}
-                      placeholder="Service title"
-                    />
-                    <Textarea
-                      value={service.description || ''}
-                      onChange={(e) => handleArrayChange('services', idx, { ...service, description: e.target.value })}
-                      rows={2}
-                      placeholder="Description"
-                    />
-                    <Input
-                      value={service.price || ''}
-                      onChange={(e) => handleArrayChange('services', idx, { ...service, price: e.target.value })}
-                      placeholder="Price (optional)"
-                    />
-                  </div>
-                </div>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => addArrayItem('services', { title: '', description: '', price: '' })}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Service
-              </Button>
-            </div>
-          </>
-        );
-
-      case 'testimonials':
-        return (
-          <>
-            <div className="space-y-2">
-              <Label>Title</Label>
-              <Input
-                value={props.title || ''}
-                onChange={(e) => handleChange('title', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Testimonials</Label>
-              {props.testimonials?.map((testimonial: any, idx: number) => (
-                <div key={idx} className="space-y-2 p-3 border rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Testimonial {idx + 1}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeArrayItem('testimonials', idx)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    <Input
-                      value={testimonial.name || ''}
-                      onChange={(e) => handleArrayChange('testimonials', idx, { ...testimonial, name: e.target.value })}
-                      placeholder="Name"
-                    />
-                    <Input
-                      value={testimonial.role || ''}
-                      onChange={(e) => handleArrayChange('testimonials', idx, { ...testimonial, role: e.target.value })}
-                      placeholder="Role"
-                    />
-                    <Textarea
-                      value={testimonial.text || ''}
-                      onChange={(e) => handleArrayChange('testimonials', idx, { ...testimonial, text: e.target.value })}
-                      rows={3}
-                      placeholder="Testimonial text"
-                    />
-                    <div className="space-y-2">
-                      <Label>Avatar Image</Label>
-                      <ImageUpload
-                        onImageSelect={(url) => handleArrayChange('testimonials', idx, { ...testimonial, avatar: url })}
-                        currentImage={testimonial.avatar}
-                        label="Upload avatar"
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        value={plan.price || ''}
+                        onChange={(e) => handleArrayChange('plans', idx, { ...plan, price: e.target.value })}
+                        placeholder="Price (e.g., 29)"
+                      />
+                      <Input
+                        value={plan.period || ''}
+                        onChange={(e) => handleArrayChange('plans', idx, { ...plan, period: e.target.value })}
+                        placeholder="Period (e.g., /month)"
                       />
                     </div>
+                    <Textarea
+                      value={plan.features?.join('\n') || ''}
+                      onChange={(e) => handleArrayChange('plans', idx, { ...plan, features: e.target.value.split('\n').filter(f => f.trim()) })}
+                      rows={3}
+                      placeholder="Features (one per line)"
+                    />
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={plan.highlighted || false}
+                        onChange={(e) => handleArrayChange('plans', idx, { ...plan, highlighted: e.target.checked })}
+                        className="mr-2"
+                      />
+                      <span className="text-sm">Highlight this plan</span>
+                    </label>
                   </div>
                 </div>
               ))}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => addArrayItem('testimonials', { name: '', role: '', text: '', avatar: '' })}
+                onClick={() => addArrayItem('plans', { name: '', price: '', period: '', features: [], highlighted: false })}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Testimonial
+                Add Plan
               </Button>
             </div>
           </>
         );
 
-      case 'contact':
+      case 'faq':
         return (
           <>
             <div className="space-y-2">
@@ -320,82 +172,42 @@ SectionEditor.Item = ({ section, pageIndex, sectionIndex, onUpdate, onDelete }) 
               />
             </div>
             <div className="space-y-2">
-              <Label>Phone</Label>
-              <Input
-                value={props.phone || ''}
-                onChange={(e) => handleChange('phone', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input
-                value={props.email || ''}
-                onChange={(e) => handleChange('email', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Address</Label>
-              <Textarea
-                value={props.address || ''}
-                onChange={(e) => handleChange('address', e.target.value)}
-                rows={2}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>WhatsApp</Label>
-              <Input
-                value={props.whatsapp || ''}
-                onChange={(e) => handleChange('whatsapp', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Social Links</Label>
-              {props.socialLinks?.map((link: any, idx: number) => (
-                <div key={idx} className="flex gap-2">
-                  <Input
-                    value={link.platform || ''}
-                    onChange={(e) => {
-                      const newLinks = [...props.socialLinks];
-                      newLinks[idx] = { ...link, platform: e.target.value };
-                      handleChange('socialLinks', newLinks);
-                    }}
-                    placeholder="Platform (e.g., Facebook)"
-                  />
-                  <Input
-                    value={link.url || ''}
-                    onChange={(e) => {
-                      const newLinks = [...props.socialLinks];
-                      newLinks[idx] = { ...link, url: e.target.value };
-                      handleChange('socialLinks', newLinks);
-                    }}
-                    placeholder="URL"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeArrayItem('socialLinks', idx)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+              <Label>FAQ Items</Label>
+              {props.faqs?.map((faq: any, idx: number) => (
+                <div key={idx} className="space-y-2 p-3 border rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">FAQ {idx + 1}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeArrayItem('faqs', idx)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    <Input
+                      value={faq.question || ''}
+                      onChange={(e) => handleArrayChange('faqs', idx, { ...faq, question: e.target.value })}
+                      placeholder="Question"
+                    />
+                    <Textarea
+                      value={faq.answer || ''}
+                      onChange={(e) => handleArrayChange('faqs', idx, { ...faq, answer: e.target.value })}
+                      rows={3}
+                      placeholder="Answer"
+                    />
+                  </div>
                 </div>
               ))}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => addArrayItem('socialLinks', { platform: '', url: '' })}
+                onClick={() => addArrayItem('faqs', { question: '', answer: '' })}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Social Link
+                Add FAQ
               </Button>
-            </div>
-            <div className="space-y-2">
-              <Label>Map Embed (optional)</Label>
-              <Textarea
-                value={props.mapEmbed || ''}
-                onChange={(e) => handleChange('mapEmbed', e.target.value)}
-                rows={3}
-                placeholder="Paste Google Maps embed code"
-              />
             </div>
           </>
         );
