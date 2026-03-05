@@ -15,12 +15,15 @@ import {
   Save, 
   ArrowLeft, 
   Eye,
+  ChevronUp,
+  ChevronDown,
   Type,
   MessageSquare,
   Phone,
   List,
   DollarSign,
-  HelpCircle
+  HelpCircle,
+  Palette
 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { showSuccess, showError } from '@/utils/toast';
@@ -126,6 +129,7 @@ export const SiteEditorEnhanced = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('edit');
+  const [showThemePanel, setShowThemePanel] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -178,6 +182,35 @@ export const SiteEditorEnhanced = () => {
     }
   };
 
+  const addPage = () => {
+    const newPage: Page = {
+      id: `page-${Date.now()}`,
+      slug: `page-${pages.length + 1}`,
+      title: `Page ${pages.length + 1}`,
+      sections: [],
+    };
+    setPages([...pages, newPage]);
+    setActivePage(pages.length);
+  };
+
+  const deletePage = (pageIndex: number) => {
+    if (pages.length <= 1) {
+      showError('Cannot delete the last page');
+      return;
+    }
+    const updatedPages = pages.filter((_, index) => index !== pageIndex);
+    setPages(updatedPages);
+    if (activePage >= updatedPages.length) {
+      setActivePage(updatedPages.length - 1);
+    }
+  };
+
+  const updatePage = (pageIndex: number, updates: Partial<Page>) => {
+    const updatedPages = [...pages];
+    updatedPages[pageIndex] = { ...updatedPages[pageIndex], ...updates };
+    setPages(updatedPages);
+  };
+
   const addSection = (pageIndex: number, type: string) => {
     const newSection: Section = {
       id: `section-${Date.now()}`,
@@ -206,11 +239,29 @@ export const SiteEditorEnhanced = () => {
     setPages(updatedPages);
   };
 
-  const moveSection = (pageIndex: number, fromIndex: number, toIndex: number) => {
+  const moveSection = (pageIndex: number, sectionId: string, direction: 'up' | 'down') => {
     const updatedPages = [...pages];
-    const [moved] = updatedPages[pageIndex].sections.splice(fromIndex, 1);
-    updatedPages[pageIndex].sections.splice(toIndex, 0, moved);
+    const sections = updatedPages[pageIndex].sections;
+    const currentIndex = sections.findIndex(s => s.id === sectionId);
+    
+    if (direction === 'up' && currentIndex > 0) {
+      [sections[currentIndex], sections[currentIndex - 1]] = [sections[currentIndex - 1], sections[currentIndex]];
+    } else if (direction === 'down' && currentIndex < sections.length - 1) {
+      [sections[currentIndex], sections[currentIndex + 1]] = [sections[currentIndex + 1], sections[currentIndex]];
+    }
+    
     setPages(updatedPages);
+  };
+
+  const updateTheme = (updates: any) => {
+    if (!site) return;
+    setSite({
+      ...site,
+      theme: {
+        ...site.theme,
+        ...updates,
+      },
+    });
   };
 
   const renderSectionEditor = (pageIndex: number, section: Section) => {
@@ -241,16 +292,34 @@ export const SiteEditorEnhanced = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <GripVertical className="h-4 w-4 text-slate-400 cursor-move" />
+              <GripVertical className="h-4 w-4 text-slate-400" />
               <CardTitle className="text-base capitalize">{type} Section</CardTitle>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => deleteSection(pageIndex, section.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => moveSection(pageIndex, section.id, 'up')}
+                disabled={pageIndex === 0}
+              >
+                <ChevronUp className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => moveSection(pageIndex, section.id, 'down')}
+                disabled={pageIndex === pages[pageIndex].sections.length - 1}
+              >
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => deleteSection(pageIndex, section.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -621,349 +690,345 @@ export const SiteEditorEnhanced = () => {
     );
   };
 
-  const renderPreview = () => {
-    const previewPage = pages[activePage];
-    if (!previewPage) return null;
-
+  const renderSectionPreview = (section: Section) => {
     const theme = site?.theme || {
       colors: { primary: '#3b82f6', secondary: '#10b981', background: '#ffffff', text: '#333333' },
       typography: { fontFamily: 'Inter, sans-serif', fontSize: '16px', lineHeight: '1.6' },
     };
 
-    const renderSectionPreview = (section: Section) => {
-      const { type, props } = section;
+    const { type, props } = section;
 
-      switch (type) {
-        case 'hero':
-          return (
-            <section 
-              className="py-20 px-4 text-center"
-              style={{
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamily,
-                backgroundImage: props.backgroundImage ? `url(${props.backgroundImage})` : 'none',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            >
-              <div className="max-w-4xl mx-auto">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: theme.colors.primary }}>
-                  {props.title}
-                </h1>
-                <p className="text-xl mb-8" style={{ color: theme.colors.secondary }}>
-                  {props.subtitle}
-                </p>
-                <button 
-                  className="px-6 py-3 rounded-lg font-medium"
-                  style={{ 
-                    backgroundColor: theme.colors.primary,
-                    color: theme.colors.background,
-                  }}
-                >
-                  {props.ctaText}
-                </button>
-              </div>
-            </section>
-          );
+    switch (type) {
+      case 'hero':
+        return (
+          <section 
+            className="py-20 px-4 text-center"
+            style={{
+              backgroundColor: theme.colors.background,
+              color: theme.colors.text,
+              fontFamily: theme.typography.fontFamily,
+              backgroundImage: props.backgroundImage ? `url(${props.backgroundImage})` : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          >
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: theme.colors.primary }}>
+                {props.title}
+              </h1>
+              <p className="text-xl mb-8" style={{ color: theme.colors.secondary }}>
+                {props.subtitle}
+              </p>
+              <button 
+                className="px-6 py-3 rounded-lg font-medium"
+                style={{ 
+                  backgroundColor: theme.colors.primary,
+                  color: theme.colors.background,
+                }}
+              >
+                {props.ctaText}
+              </button>
+            </div>
+          </section>
+        );
 
-        case 'about':
-          return (
-            <section 
-              className="py-16 px-4"
-              style={{
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamily,
-              }}
-            >
-              <div className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                  <div>
-                    <h2 className="text-3xl font-bold mb-6" style={{ color: theme.colors.primary }}>
-                      {props.title}
-                    </h2>
-                    <p className="text-lg mb-6">{props.description}</p>
-                    {props.features && props.features.length > 0 && (
-                      <div className="space-y-4">
-                        {props.features.map((feature: any, idx: number) => (
-                          <div key={idx} className="flex items-start space-x-3">
-                            <div 
-                              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                              style={{ backgroundColor: theme.colors.primary }}
-                            >
-                              <span className="text-white text-sm">✓</span>
-                            </div>
-                            <div>
-                              <h3 className="font-semibold">{feature.title}</h3>
-                              <p className="text-sm opacity-80">{feature.description}</p>
-                            </div>
+      case 'about':
+        return (
+          <section 
+            className="py-16 px-4"
+            style={{
+              backgroundColor: theme.colors.background,
+              color: theme.colors.text,
+              fontFamily: theme.typography.fontFamily,
+            }}
+          >
+            <div className="max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h2 className="text-3xl font-bold mb-6" style={{ color: theme.colors.primary }}>
+                    {props.title}
+                  </h2>
+                  <p className="text-lg mb-6">{props.description}</p>
+                  {props.features && props.features.length > 0 && (
+                    <div className="space-y-4">
+                      {props.features.map((feature: any, idx: number) => (
+                        <div key={idx} className="flex items-start space-x-3">
+                          <div 
+                            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: theme.colors.primary }}
+                          >
+                            <span className="text-white text-sm">✓</span>
                           </div>
-                        ))}
+                          <div>
+                            <h3 className="font-semibold">{feature.title}</h3>
+                            <p className="text-sm opacity-80">{feature.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {props.image && (
+                  <div>
+                    <img src={props.image} alt="About" className="rounded-lg shadow-lg w-full" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'services':
+        return (
+          <section 
+            className="py-16 px-4"
+            style={{
+              backgroundColor: theme.colors.background,
+              color: theme.colors.text,
+              fontFamily: theme.typography.fontFamily,
+            }}
+          >
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
+                {props.title}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {props.services?.map((service: any, idx: number) => (
+                  <div key={idx} className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
+                    <div 
+                      className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+                      style={{ backgroundColor: theme.colors.primary }}
+                    >
+                      <span className="text-white text-xl">●</span>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                    <p className="mb-4 opacity-80">{service.description}</p>
+                    {service.price && (
+                      <p className="text-2xl font-bold" style={{ color: theme.colors.primary }}>
+                        ${service.price}
+                        <span className="text-sm font-normal opacity-60">/month</span>
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'testimonials':
+        return (
+          <section 
+            className="py-16 px-4"
+            style={{
+              backgroundColor: theme.colors.background,
+              color: theme.colors.text,
+              fontFamily: theme.typography.fontFamily,
+            }}
+          >
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
+                {props.title}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {props.testimonials?.map((testimonial: any, idx: number) => (
+                  <div key={idx} className="p-6 border rounded-lg">
+                    <p className="text-lg italic mb-4">"{testimonial.text}"</p>
+                    <div className="flex items-center gap-3">
+                      {testimonial.avatar && (
+                        <img src={testimonial.avatar} alt={testimonial.name} className="w-12 h-12 rounded-full" />
+                      )}
+                      <div>
+                        <p className="font-semibold">{testimonial.name}</p>
+                        <p className="text-sm opacity-60">{testimonial.role}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'pricing':
+        return (
+          <section 
+            className="py-16 px-4"
+            style={{
+              backgroundColor: theme.colors.background,
+              color: theme.colors.text,
+              fontFamily: theme.typography.fontFamily,
+            }}
+          >
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
+                {props.title}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {props.plans?.map((plan: any, idx: number) => (
+                  <div 
+                    key={idx} 
+                    className={`p-6 border rounded-lg ${plan.highlighted ? 'border-2 shadow-lg scale-105' : ''}`}
+                    style={plan.highlighted ? { borderColor: theme.colors.primary } : {}}
+                  >
+                    {plan.highlighted && (
+                      <div className="text-sm font-semibold mb-2" style={{ color: theme.colors.primary }}>
+                        MOST POPULAR
+                      </div>
+                    )}
+                    <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+                    <div className="mb-6">
+                      <span className="text-4xl font-bold" style={{ color: theme.colors.primary }}>${plan.price}</span>
+                      <span className="opacity-60">/{plan.period}</span>
+                    </div>
+                    <ul className="space-y-3 mb-6">
+                      {plan.features?.map((feature: string, fIdx: number) => (
+                        <li key={fIdx} className="flex items-center gap-2">
+                          <span className="text-green-500">✓</span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <button 
+                      className="w-full py-2 rounded-lg font-medium"
+                      style={{ 
+                        backgroundColor: plan.highlighted ? theme.colors.primary : 'transparent',
+                        color: plan.highlighted ? theme.colors.background : theme.colors.primary,
+                        border: plan.highlighted ? 'none' : `1px solid ${theme.colors.primary}`,
+                      }}
+                    >
+                      Choose Plan
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'faq':
+        return (
+          <section 
+            className="py-16 px-4"
+            style={{
+              backgroundColor: theme.colors.background,
+              color: theme.colors.text,
+              fontFamily: theme.typography.fontFamily,
+            }}
+          >
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
+                {props.title}
+              </h2>
+              <div className="space-y-4">
+                {props.faqs?.map((faq: any, idx: number) => (
+                  <div key={idx} className="border rounded-lg p-4">
+                    <h3 className="font-semibold text-lg mb-2" style={{ color: theme.colors.primary }}>
+                      {faq.question}
+                    </h3>
+                    <p className="opacity-80">{faq.answer}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'contact':
+        return (
+          <section 
+            className="py-16 px-4"
+            style={{
+              backgroundColor: theme.colors.background,
+              color: theme.colors.text,
+              fontFamily: theme.typography.fontFamily,
+            }}
+          >
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
+                {props.title}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                  <div className="space-y-6">
+                    {props.phone && (
+                      <div>
+                        <h3 className="font-semibold mb-1">Phone</h3>
+                        <p className="opacity-80">{props.phone}</p>
+                      </div>
+                    )}
+                    {props.email && (
+                      <div>
+                        <h3 className="font-semibold mb-1">Email</h3>
+                        <p className="opacity-80">{props.email}</p>
+                      </div>
+                    )}
+                    {props.address && (
+                      <div>
+                        <h3 className="font-semibold mb-1">Address</h3>
+                        <p className="opacity-80">{props.address}</p>
+                      </div>
+                    )}
+                    {props.whatsapp && (
+                      <div>
+                        <h3 className="font-semibold mb-1">WhatsApp</h3>
+                        <p className="opacity-80">{props.whatsapp}</p>
+                      </div>
+                    )}
+                    {props.socialLinks && props.socialLinks.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold mb-2">Social Links</h3>
+                        <div className="space-y-2">
+                          {props.socialLinks.map((link: any, idx: number) => (
+                            <a 
+                              key={idx} 
+                              href={link.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="block hover:underline"
+                              style={{ color: theme.colors.primary }}
+                            >
+                              {link.platform || 'Social Link'}
+                            </a>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
-                  {props.image && (
-                    <div>
-                      <img src={props.image} alt="About" className="rounded-lg shadow-lg w-full" />
-                    </div>
-                  )}
                 </div>
-              </div>
-            </section>
-          );
-
-        case 'services':
-          return (
-            <section 
-              className="py-16 px-4"
-              style={{
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamily,
-              }}
-            >
-              <div className="max-w-6xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
-                  {props.title}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {props.services?.map((service: any, idx: number) => (
-                    <div key={idx} className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
-                      <div 
-                        className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
-                        style={{ backgroundColor: theme.colors.primary }}
-                      >
-                        <span className="text-white text-xl">●</span>
-                      </div>
-                      <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                      <p className="mb-4 opacity-80">{service.description}</p>
-                      {service.price && (
-                        <p className="text-2xl font-bold" style={{ color: theme.colors.primary }}>
-                          ${service.price}
-                          <span className="text-sm font-normal opacity-60">/month</span>
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-          );
-
-        case 'testimonials':
-          return (
-            <section 
-              className="py-16 px-4"
-              style={{
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamily,
-              }}
-            >
-              <div className="max-w-4xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
-                  {props.title}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {props.testimonials?.map((testimonial: any, idx: number) => (
-                    <div key={idx} className="p-6 border rounded-lg">
-                      <p className="text-lg italic mb-4">"{testimonial.text}"</p>
-                      <div className="flex items-center gap-3">
-                        {testimonial.avatar && (
-                          <img src={testimonial.avatar} alt={testimonial.name} className="w-12 h-12 rounded-full" />
-                        )}
-                        <div>
-                          <p className="font-semibold">{testimonial.name}</p>
-                          <p className="text-sm opacity-60">{testimonial.role}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-          );
-
-        case 'pricing':
-          return (
-            <section 
-              className="py-16 px-4"
-              style={{
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamily,
-              }}
-            >
-              <div className="max-w-6xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
-                  {props.title}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {props.plans?.map((plan: any, idx: number) => (
-                    <div 
-                      key={idx} 
-                      className={`p-6 border rounded-lg ${plan.highlighted ? 'border-2 shadow-lg scale-105' : ''}`}
-                      style={plan.highlighted ? { borderColor: theme.colors.primary } : {}}
-                    >
-                      {plan.highlighted && (
-                        <div className="text-sm font-semibold mb-2" style={{ color: theme.colors.primary }}>
-                          MOST POPULAR
-                        </div>
-                      )}
-                      <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                      <div className="mb-6">
-                        <span className="text-4xl font-bold" style={{ color: theme.colors.primary }}>${plan.price}</span>
-                        <span className="opacity-60">/{plan.period}</span>
-                      </div>
-                      <ul className="space-y-3 mb-6">
-                        {plan.features?.map((feature: string, fIdx: number) => (
-                          <li key={fIdx} className="flex items-center gap-2">
-                            <span className="text-green-500">✓</span>
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <button 
-                        className="w-full py-2 rounded-lg font-medium"
-                        style={{ 
-                          backgroundColor: plan.highlighted ? theme.colors.primary : 'transparent',
-                          color: plan.highlighted ? theme.colors.background : theme.colors.primary,
-                          border: plan.highlighted ? 'none' : `1px solid ${theme.colors.primary}`,
-                        }}
-                      >
-                        Choose Plan
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-          );
-
-        case 'faq':
-          return (
-            <section 
-              className="py-16 px-4"
-              style={{
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamily,
-              }}
-            >
-              <div className="max-w-3xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
-                  {props.title}
-                </h2>
-                <div className="space-y-4">
-                  {props.faqs?.map((faq: any, idx: number) => (
-                    <div key={idx} className="border rounded-lg p-4">
-                      <h3 className="font-semibold text-lg mb-2" style={{ color: theme.colors.primary }}>
-                        {faq.question}
-                      </h3>
-                      <p className="opacity-80">{faq.answer}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-          );
-
-        case 'contact':
-          return (
-            <section 
-              className="py-16 px-4"
-              style={{
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamily,
-              }}
-            >
-              <div className="max-w-6xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-12" style={{ color: theme.colors.primary }}>
-                  {props.title}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                {props.mapEmbed && (
                   <div>
-                    <div className="space-y-6">
-                      {props.phone && (
-                        <div>
-                          <h3 className="font-semibold mb-1">Phone</h3>
-                          <p className="opacity-80">{props.phone}</p>
-                        </div>
-                      )}
-                      {props.email && (
-                        <div>
-                          <h3 className="font-semibold mb-1">Email</h3>
-                          <p className="opacity-80">{props.email}</p>
-                        </div>
-                      )}
-                      {props.address && (
-                        <div>
-                          <h3 className="font-semibold mb-1">Address</h3>
-                          <p className="opacity-80">{props.address}</p>
-                        </div>
-                      )}
-                      {props.whatsapp && (
-                        <div>
-                          <h3 className="font-semibold mb-1">WhatsApp</h3>
-                          <p className="opacity-80">{props.whatsapp}</p>
-                        </div>
-                      )}
-                      {props.socialLinks && props.socialLinks.length > 0 && (
-                        <div>
-                          <h3 className="font-semibold mb-2">Social Links</h3>
-                          <div className="space-y-2">
-                            {props.socialLinks.map((link: any, idx: number) => (
-                              <a 
-                                key={idx} 
-                                href={link.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="block hover:underline"
-                                style={{ color: theme.colors.primary }}
-                              >
-                                {link.platform || 'Social Link'}
-                              </a>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                    <h3 className="font-semibold mb-4">Find Us</h3>
+                    <div className="aspect-video rounded-lg overflow-hidden">
+                      <iframe
+                        src={props.mapEmbed}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                      ></iframe>
                     </div>
                   </div>
-                  {props.mapEmbed && (
-                    <div>
-                      <h3 className="font-semibold mb-4">Find Us</h3>
-                      <div className="aspect-video rounded-lg overflow-hidden">
-                        <iframe
-                          src={props.mapEmbed}
-                          width="100%"
-                          height="100%"
-                          style={{ border: 0 }}
-                          allowFullScreen
-                          loading="lazy"
-                        ></iframe>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
-            </section>
-          );
+            </div>
+          </section>
+        );
 
-        default:
-          return (
-            <section 
-              className="py-8 px-4"
-              style={{
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamily,
-              }}
-            >
-              <p>Unknown section type: {type}</p>
-            </section>
-          );
+      default:
+        return (
+          <section 
+            className="py-8 px-4"
+            style={{
+              backgroundColor: theme.colors.background,
+              color: theme.colors.text,
+              fontFamily: theme.typography.fontFamily,
+            }}
+          >
+            <p>Unknown section type: {type}</p>
+          </section>
+        );
     }
   };
 
@@ -996,6 +1061,13 @@ export const SiteEditorEnhanced = () => {
           <div className="flex gap-2">
             <Button
               variant="outline"
+              onClick={() => setShowThemePanel(!showThemePanel)}
+            >
+              <Palette className="h-4 w-4 mr-2" />
+              Theme
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => window.open(`/sites/${id}`, '_blank')}
             >
               <Eye className="h-4 w-4 mr-2" />
@@ -1007,6 +1079,101 @@ export const SiteEditorEnhanced = () => {
             </Button>
           </div>
         </div>
+
+        {showThemePanel && (
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Theme Customization
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Primary Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={site?.theme?.colors?.primary || '#3b82f6'}
+                      onChange={(e) => updateTheme({ colors: { ...site.theme.colors, primary: e.target.value } })}
+                      className="w-12 h-10 p-1"
+                    />
+                    <Input
+                      value={site?.theme?.colors?.primary || '#3b82f6'}
+                      onChange={(e) => updateTheme({ colors: { ...site.theme.colors, primary: e.target.value } })}
+                      placeholder="#3b82f6"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Secondary Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={site?.theme?.colors?.secondary || '#10b981'}
+                      onChange={(e) => updateTheme({ colors: { ...site.theme.colors, secondary: e.target.value } })}
+                      className="w-12 h-10 p-1"
+                    />
+                    <Input
+                      value={site?.theme?.colors?.secondary || '#10b981'}
+                      onChange={(e) => updateTheme({ colors: { ...site.theme.colors, secondary: e.target.value } })}
+                      placeholder="#10b981"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Background Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={site?.theme?.colors?.background || '#ffffff'}
+                      onChange={(e) => updateTheme({ colors: { ...site.theme.colors, background: e.target.value } })}
+                      className="w-12 h-10 p-1"
+                    />
+                    <Input
+                      value={site?.theme?.colors?.background || '#ffffff'}
+                      onChange={(e) => updateTheme({ colors: { ...site.theme.colors, background: e.target.value } })}
+                      placeholder="#ffffff"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Text Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={site?.theme?.colors?.text || '#333333'}
+                      onChange={(e) => updateTheme({ colors: { ...site.theme.colors, text: e.target.value } })}
+                      className="w-12 h-10 p-1"
+                    />
+                    <Input
+                      value={site?.theme?.colors?.text || '#333333'}
+                      onChange={(e) => updateTheme({ colors: { ...site.theme.colors, text: e.target.value } })}
+                      placeholder="#333333"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Font Family</Label>
+                <select
+                  value={site?.theme?.typography?.fontFamily || 'Inter, sans-serif'}
+                  onChange={(e) => updateTheme({ typography: { ...site.theme.typography, fontFamily: e.target.value } })}
+                  className="w-full p-2 border border-slate-200 rounded-md"
+                >
+                  <option value="Inter, sans-serif">Inter</option>
+                  <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                  <option value="'Roboto', sans-serif">Roboto</option>
+                  <option value="'Open Sans', sans-serif">Open Sans</option>
+                  <option value="'Montserrat', sans-serif">Montserrat</option>
+                  <option value="'Playfair Display', serif">Playfair Display</option>
+                  <option value="'Merriweather', serif">Merriweather</option>
+                </select>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList>
@@ -1024,16 +1191,27 @@ export const SiteEditorEnhanced = () => {
                   <CardContent>
                     <div className="space-y-2">
                       {pages.map((page, index) => (
-                        <Button
-                          key={page.id}
-                          variant={activePage === index ? 'default' : 'ghost'}
-                          className="w-full justify-start"
-                          onClick={() => setActivePage(index)}
-                        >
-                          {page.title}
-                        </Button>
+                        <div key={page.id} className="flex items-center gap-1">
+                          <Button
+                            variant={activePage === index ? 'default' : 'ghost'}
+                            className="flex-1 justify-start"
+                            onClick={() => setActivePage(index)}
+                          >
+                            {page.title}
+                          </Button>
+                          {pages.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deletePage(index)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       ))}
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button variant="outline" className="w-full justify-start" onClick={addPage}>
                         <Plus className="h-4 w-4 mr-2" />
                         Add Page
                       </Button>
@@ -1119,7 +1297,32 @@ export const SiteEditorEnhanced = () => {
               <CardContent className="p-0">
                 <div className="border-b p-4 bg-slate-50">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Live Preview</span>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm font-medium">Live Preview</span>
+                      {pages.length > 1 && (
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setActivePage(Math.max(0, activePage - 1))}
+                            disabled={activePage === 0}
+                          >
+                            Previous
+                          </Button>
+                          <span className="text-sm">
+                            Page {activePage + 1} of {pages.length}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setActivePage(Math.min(pages.length - 1, activePage + 1))}
+                            disabled={activePage === pages.length - 1}
+                          >
+                            Next
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                     <Button
                       variant="outline"
                       size="sm"
