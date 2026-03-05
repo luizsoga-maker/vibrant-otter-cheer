@@ -1,29 +1,6 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
+import 'dotenv/config';
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import './globals.css';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  // Global prefix
-  app.setGlobalPrefix('api');
-
-  // CORS
-  app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,
-  });
-
-  // Global pipes
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
-
-  // Global filters
-  app.useGlobalFilters(new HttpExceptionFilter());
-
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
-  console.log(`API running on port ${port}`);
-}
-
-bootstrap();
+createRoot(document.getElementById('root')!).render(<App />);
