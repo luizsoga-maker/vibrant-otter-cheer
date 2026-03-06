@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Plus, ExternalLink, Edit } from 'lucide-react';
 import { showError } from '@/utils/toast';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { API_BASE_URL } from '@/config';
 
 interface Site {
   id: string;
@@ -26,7 +27,7 @@ export const Dashboard = () => {
   useEffect(() => {
     const fetchSites = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/sites', {
+        const response = await fetch(`${API_BASE_URL}/api/sites`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
