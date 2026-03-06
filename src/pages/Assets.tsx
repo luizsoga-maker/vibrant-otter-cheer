@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Image, Upload, Trash2, Loader2 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+import { API_BASE_URL } from '@/config';
 
 interface Asset {
   id: string;
@@ -27,7 +28,7 @@ export const Assets = () => {
 
   const fetchAssets = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/assets', {
+      const response = await fetch(`${API_BASE_URL}/api/assets`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -63,7 +64,7 @@ export const Assets = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('http://localhost:3000/api/assets/upload', {
+      const response = await fetch(`${API_BASE_URL}/api/assets/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
