@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Home, Search } from 'lucide-react';
+import { BASE_PATH } from '@/config';
 
 const NotFound = () => {
   const location = useLocation();
@@ -15,9 +16,16 @@ const NotFound = () => {
     const search = window.location.search;
     const hash = window.location.hash;
     
+    // If we're already at index.html, don't redirect
+    if (path.endsWith('/index.html')) {
+      return;
+    }
+
     // Delay redirect slightly to allow UI to render
     const timer = setTimeout(() => {
-      window.location.replace(`/index.html${path}${search}${hash}`);
+      // For GitHub Pages, we need to redirect to index.html with the full path
+      // The BASE_PATH is already included in the path if set correctly
+      window.location.replace(`${BASE_PATH}index.html${path}${search}${hash}`);
     }, 100);
     
     return () => clearTimeout(timer);

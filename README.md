@@ -11,6 +11,11 @@ const base = '/sitecraft-ai/'; // Para repositório de projeto
 const base = '/'; // Para user site (username.github.io)
 ```
 
+**Better approach: Use environment variable**
+Set `VITE_BASE_PATH` in your GitHub Actions workflow or local `.env` file:
+- For project pages: `VITE_BASE_PATH=/your-repo-name/`
+- For user/organization pages: `VITE_BASE_PATH=/`
+
 ### 2. Faça o build:
 ```bash
 npm run build
@@ -34,6 +39,7 @@ npm run build
 Settings → Pages → Build and deployment → Environment variables:
 ```
 VITE_API_URL=https://seu-backend.com
+VITE_BASE_PATH=/sitecraft-ai/  # Only for project pages
 ```
 
 ## Desenvolvimento

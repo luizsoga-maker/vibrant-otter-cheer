@@ -1,5 +1,8 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+// Get the base path for the app (used for routing)
+export const BASE_PATH = import.meta.env.VITE_BASE_PATH || '/';
+
 export const API_ENDPOINTS = {
   AI_GENERATE: `${API_BASE_URL}/api/ai/generate`,
   AUTH_LOGIN: `${API_BASE_URL}/api/auth/login`,

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import Index from './pages/Index';
 import { Login } from './pages/Login';
@@ -9,11 +9,9 @@ import { SiteEditorEnhanced } from './components/site-editor/SiteEditorEnhanced'
 import { SitePreview } from './pages/SitePreview';
 import { Assets } from './pages/Assets';
 import NotFound from './pages/NotFound';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export const App = () => {
-  const location = useLocation();
-
   return (
     <Router>
       <AuthProvider>

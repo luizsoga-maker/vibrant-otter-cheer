@@ -4,7 +4,8 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 const isProduction = process.env.NODE_ENV === "production";
-const base = isProduction ? "/vibrant-otter-cheer/" : "/";
+// Use VITE_BASE_PATH env var if set, otherwise default to repo name pattern
+const base = process.env.VITE_BASE_PATH || (isProduction ? "/vibrant-otter-cheer/" : "/");
 
 export default defineConfig({
   base,
