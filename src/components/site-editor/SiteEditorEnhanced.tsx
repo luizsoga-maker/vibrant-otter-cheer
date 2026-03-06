@@ -1,5 +1,3 @@
-"use client";
-
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { 
@@ -18,12 +16,10 @@ import {
   ApiIntegrationsPanel,
   CachingPanel,
   CollaborationPanel,
-  SEOPanel
+  SEOPanel,
+  ThemeSettingsPanel
 } from './index';
 import { useSiteEditor } from './useSiteEditor';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import type { Section } from './types';
 
 export const SiteEditorEnhanced = () => {
   const navigate = useNavigate();
@@ -102,8 +98,10 @@ export const SiteEditorEnhanced = () => {
             <AnalyticsPanel />
             <ApiIntegrationsPanel />
             <CachingPanel />
-            <CollaborationPanel />
-            <SEOPanel />
+            <CollaborationPanel>
+              <SEOPanel />
+              <ThemeSettingsPanel />
+            </CollaborationPanel>
           </>
         }
         rightPanel={
@@ -112,7 +110,7 @@ export const SiteEditorEnhanced = () => {
               <Label>Page Title</Label>
               <Input
                 value={currentPage?.title || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePageTitle(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePageTitle((e.target as HTMLInputElement).value)}
               />
             </div>
 
@@ -120,14 +118,14 @@ export const SiteEditorEnhanced = () => {
               <Label>Page Slug</Label>
               <Input
                 value={currentPage?.slug || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePageSlug(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePageSlug((e.target as HTMLInputElement).value)}
               />
             </div>
 
             <div className="border-t pt-4">
               <h3 className="text-base font-semibold mb-4">Sections</h3>
               <div className="space-y-4">
-                {currentPage?.sections?.map((section: Section) => (
+                {currentPage?.sections?.map((section: any) => (
                   <div key={section.id}>
                     <div className="p-4 border rounded">
                       <p className="font-medium capitalize">{section.type}</p>
@@ -143,7 +141,7 @@ export const SiteEditorEnhanced = () => {
                 )}
               </div>
             </div>
-          </div>
+          </>
         }
       />
     </MainLayout>

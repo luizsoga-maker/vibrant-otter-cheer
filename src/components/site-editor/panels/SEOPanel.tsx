@@ -10,7 +10,7 @@ import { useSiteEditor } from '../useSiteEditor';
 export const SEOPanel: React.FC = () => {
   const { currentPage, updatePage } = useSiteEditor();
 
-  const seoData = currentPage?.seo || {
+  const seoData = (currentPage as any)?.seo || {
     title: '',
     description: '',
     keywords: '',
@@ -38,7 +38,7 @@ export const SEOPanel: React.FC = () => {
           <Input
             id="seo-title"
             value={seoData.title || ''}
-            onChange={(e) => handleUpdate('title', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate('title', e.target.value)}
             placeholder="Page title for search engines"
             maxLength={60}
           />
@@ -52,7 +52,7 @@ export const SEOPanel: React.FC = () => {
           <Textarea
             id="seo-description"
             value={seoData.description || ''}
-            onChange={(e) => handleUpdate('description', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleUpdate('description', e.target.value)}
             placeholder="Brief description for search engines"
             rows={3}
             maxLength={160}
@@ -67,7 +67,7 @@ export const SEOPanel: React.FC = () => {
           <Input
             id="seo-keywords"
             value={seoData.keywords || ''}
-            onChange={(e) => handleUpdate('keywords', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate('keywords', e.target.value)}
             placeholder="keyword1, keyword2, keyword3"
           />
         </div>
@@ -77,7 +77,7 @@ export const SEOPanel: React.FC = () => {
           <Input
             id="seo-ogImage"
             value={seoData.ogImage || ''}
-            onChange={(e) => handleUpdate('ogImage', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate('ogImage', e.target.value)}
             placeholder="https://..."
           />
           <p className="text-xs text-slate-500">
@@ -85,22 +85,12 @@ export const SEOPanel: React.FC = () => {
           </p>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="seo-canonicalUrl">Canonical URL</Label>
-          <Input
-            id="seo-canonicalUrl"
-            value={seoData.canonicalUrl || ''}
-            onChange={(e) => handleUpdate('canonicalUrl', e.target.value)}
-            placeholder="https://yourdomain.com/page"
-          />
-        </div>
-
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
             id="seo-noIndex"
             checked={seoData.noIndex || false}
-            onChange={(e) => handleUpdate('noIndex', e.target.checked)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate('noIndex', e.target.checked)}
             className="rounded border-slate-300"
           />
           <Label htmlFor="seo-noIndex" className="text-sm font-normal">

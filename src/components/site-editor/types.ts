@@ -13,7 +13,7 @@ export interface Site {
       fontFamily: string;
       fontSize: string;
       lineHeight: string;
-    };
+    },
   };
   pages: Page[];
 }
@@ -23,13 +23,25 @@ export interface Page {
   slug: string;
   title: string;
   sections: Section[];
+  // Added missing properties
+  theme?: {
+    colors: {
+      primary: string;
+      secondary: string;
+      background: string;
+      text: string;
+    };
+    typography: {
+      fontFamily: string;
+      fontSize: string;
+      lineHeight: string;
+    };
+  };
   seo?: {
     title?: string;
     description?: string;
     keywords?: string;
     ogImage?: string;
-    canonicalUrl?: string;
-    noIndex?: boolean;
   };
   analytics?: {
     googleAnalyticsId?: string;
@@ -90,16 +102,11 @@ export interface Section {
   props: Record<string, any>;
 }
 
+// Added missing state types
 export interface CDNState {
-  provider: 'Cloudflare' | 'AWS CloudFront' | 'Fastly' | 'Akamai';
-  status: 'active' | 'pending' | 'error';
-  cacheHitRate: string;
-  edgeLocations: number;
-  dataTransfer: string;
+  // Empty for now - can be extended later
 }
 
 export interface DeploymentState {
-  status: 'idle' | 'deploying' | 'completed' | 'failed';
-  progress: number;
-  target: 'production' | 'staging' | 'development';
+  // Empty for now - can be extended later
 }
