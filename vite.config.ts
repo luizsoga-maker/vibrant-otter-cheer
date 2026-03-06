@@ -3,12 +3,11 @@ import dyadComponentTagger from "@dyad-sh/react-vite-component-tagger";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
-// IMPORTANTE: Para GitHub Pages, a base deve ser o nome do seu repositório
-// Seu repositório: vibrant-otter-cheer
-const base = '/vibrant-otter-cheer/';
+const isProduction = process.env.NODE_ENV === "production";
+const base = isProduction ? "/vibrant-otter-cheer/" : "/";
 
 export default defineConfig({
-  base: base,
+  base,
   server: {
     host: "::",
     port: 8080,
