@@ -23,7 +23,7 @@ export interface Page {
   slug: string;
   title: string;
   sections: Section[];
-  // Added missing properties
+  // Add theme property to resolve TypeScript error
   theme?: {
     colors: {
       primary: string;
@@ -109,4 +109,19 @@ export interface CDNState {
 
 export interface DeploymentState {
   // Empty for now - can be extended later
+}
+
+// Added missing ThemeSettingsState type
+export interface ThemeSettingsState {
+  colors: {
+    primary: string;
+    secondary: string;
+    background: string;
+    text: string;
+  };
+  typography: {
+    fontFamily: string;
+    fontSize: string;
+    lineHeight: string;
+  };
 }
