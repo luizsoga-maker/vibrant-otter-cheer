@@ -61,6 +61,7 @@ export const useSiteEditor = () => {
             title: page.title,
             slug: page.slug,
             sections: page.sections,
+            theme: page.theme,
             seo: page.seo,
             analytics: page.analytics,
             forms: page.forms,
