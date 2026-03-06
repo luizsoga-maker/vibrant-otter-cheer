@@ -1,3 +1,5 @@
+"use client";
+
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -7,12 +9,19 @@ import { Home, Search } from 'lucide-react';
 const NotFound = () => {
   const location = useLocation();
 
+  // Redirect all 404s to index.html for SPA routing on GitHub Pages
   useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname,
-    );
-  }, [location.pathname]);
+    const path = window.location.pathname;
+    const search = window.location.search;
+    const hash = window.location.hash;
+    
+    // Delay redirect slightly to allow UI to render
+    const timer = setTimeout(() => {
+      window.location.replace(`/index.html${path}${search}${hash}`);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [location]);
 
   return (
     <MainLayout>
@@ -21,7 +30,7 @@ const NotFound = () => {
           <div className="mb-8">
             <h1 className="text-9xl font-bold text-slate-200">404</h1>
             <div className="relative -mt-16">
-              <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto">
+              <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto">
                 <Search className="h-12 w-12 text-white" />
               </div>
             </div>
@@ -35,15 +44,12 @@ const NotFound = () => {
           
           <div className="space-y-3">
             <Button asChild size="lg" className="w-full">
-              <a href="/">
-                <Home className="h-4 w-4 mr-2" />
-                Go to Homepage
-              </a>
+              <Home className="h-4 w-4 mr-2" />
+              Go to Homepage
             </Button>
             <Button asChild variant="outline" size="lg" className="w-full">
-              <a href="/dashboard">
-                Go to Dashboard
-              </a>
+              <Search className="h-4 w-4 mr-2" />
+              Search
             </Button>
           </div>
         </div>

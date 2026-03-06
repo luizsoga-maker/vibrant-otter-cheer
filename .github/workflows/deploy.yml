@@ -27,3 +27,10 @@ jobs:
           publish_dir: ./dist
           publish_branch: gh-pages
           force_orphan: true
+          # Set base path for GitHub Pages deployment
+          # This ensures proper routing when using custom base paths
+          # The base path will be automatically inferred from repo name
+          # but we also set it explicitly for clarity
+          # Add this before the publish step if needed:
+          # env:
+          #   VITE_BASE_PATH: ${{ github.repository_owner }}/${{ github.event.repository.name }}

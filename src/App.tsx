@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import Index from './pages/Index';
 import { Login } from './pages/Login';
@@ -9,9 +9,33 @@ import { SiteEditorEnhanced } from './components/site-editor/SiteEditorEnhanced'
 import { SitePreview } from './pages/SitePreview';
 import { Assets } from './pages/Assets';
 import NotFound from './pages/NotFound';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
-function ErrorBoundary({ children }: { children: React.ReactNode }) {
+export const App = () => {
+  const location = useLocation();
+
+  return (
+    <Router>
+      <AuthProvider>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/ai-generator" element={<AIGenerator />} />
+            <Route path="/sites/:id/edit" element={<SiteEditorEnhanced />} />
+            <Route path="/sites/:id" element={<SitePreview />} />
+            <Route path="/assets" element={<Assets />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
+      </AuthProvider>
+    </Router>
+  );
+};
+
+const ErrorBoundary = ({ children }: { children: React.ReactNode }) => {
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
@@ -42,28 +66,6 @@ function ErrorBoundary({ children }: { children: React.ReactNode }) {
   }
 
   return children;
-}
-
-const App = () => {
-  return (
-    <Router>
-      <AuthProvider>
-        <ErrorBoundary>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/ai-generator" element={<AIGenerator />} />
-            <Route path="/sites/:id/edit" element={<SiteEditorEnhanced />} />
-            <Route path="/sites/:id" element={<SitePreview />} />
-            <Route path="/assets" element={<Assets />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </ErrorBoundary>
-      </AuthProvider>
-    </Router>
-  );
 };
 
 export default App;
