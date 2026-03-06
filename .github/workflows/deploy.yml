@@ -9,7 +9,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: false  # Allow later git config setup
+          persist-credentials: true
+          token: ${{ secrets.ACCESS_TOKEN }}
       
       - name: Setup Node
         uses: actions/setup-node@v4
