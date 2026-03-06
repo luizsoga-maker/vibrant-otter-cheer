@@ -1,8 +1,11 @@
-#!/bin/bash
-echo "Building..."
-npm run build
-echo "Deploying to GitHub Pages..."
-git add dist
-git commit -m "Deploy to GitHub Pages"
-git push origin main   # or the branch you use
-echo "Done."
+"use strict";
+const { execSync } = require("child_process");
+console.log("🔨 Building...");
+execSync("npm run build", { stdio: "inherit" });
+console.log("🚀 Adding dist/ to git");
+execSync("git add dist", { stdio: "inherit" });
+const msg = `Deploy build ${new Date().toISOString().slice(0,10)}`;
+execSync(`git commit -m "${msg}"`, { stdio: "inherit" });
+console.log("📤 Pushing to GitHub");
+execSync("git push origin main", { stdio: "inherit" });
+console.log("✅ Deploy finished");
