@@ -106,21 +106,14 @@ export const useSiteEditor = () => {
     }
   };
 
-  const updatePageTitle = (title: string) => {
+  const addSection = (type: string) => {
+    const newSection: Section = {
+      id: `section-${Date.now()}`,
+      type,
+      props: getDefaultProps(type),
+    };
     const updated = [...pages];
-    updated[activePage].title = title;
-    setPages(updated);
-  };
-
-  const updatePageSlug = (slug: string) => {
-    const updated = [...pages];
-    updated[activePage].slug = slug;
-    setPages(updated);
-  };
-
-  const updateSection = (pageIndex: number, sectionIndex: number, props: Record<string, any>) => {
-    const updated = [...pages];
-    updated[pageIndex].sections[sectionIndex].props = props;
+    updated[activePage].sections.push(newSection);
     setPages(updated);
   };
 
@@ -130,14 +123,9 @@ export const useSiteEditor = () => {
     setPages(updated);
   };
 
-  const addSection = (type: string) => {
-    const newSection: Section = {
-      id: `section-${Date.now()}`,
-      type,
-      props: getDefaultProps(type),
-    };
+  const updateSection = (pageIndex: number, sectionIndex: number, props: Record<string, any>) => {
     const updated = [...pages];
-    updated[activePage].sections.push(newSection);
+    updated[pageIndex].sections[sectionIndex].props = props;
     setPages(updated);
   };
 
@@ -158,11 +146,9 @@ export const useSiteEditor = () => {
     saveSite,
     deploySite,
     updatePage,
-    updatePageTitle,
-    updatePageSlug,
-    updateSection,
-    deleteSection,
     addSection,
+    deleteSection,
+    updateSection,
     currentPage,
   };
 };
